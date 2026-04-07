@@ -33,6 +33,9 @@ async def cminer_lifespan(server):
         support=1,
         max_nodes=10,
         string_output=True,
+        show_mappings=True,
+        directed_graph=True,
+        with_frequencies=True,
     )
     try:
         yield {"cminer": cminer}
