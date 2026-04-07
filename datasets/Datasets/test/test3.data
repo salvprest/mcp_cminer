@@ -1,0 +1,1604 @@
+t # 72a4b5b6-5b33-49df-8fbb-36e3e931d39c
+v 1 BusinessRole
+v 2 BusinessProcess
+v 3 BusinessRole
+v 4 BusinessActor
+v 5 BusinessRole
+v 6 BusinessActor
+v 7 BusinessProcess
+v 8 BusinessRole
+v 9 BusinessProcess
+v 10 BusinessActor
+v 11 BusinessObject
+v 12 BusinessObject
+v 13 BusinessObject
+v 14 ApplicationComponent
+v 15 ApplicationFunction
+v 16 DataObject
+v 17 ApplicationInterface
+v 18 ApplicationService
+v 19 ApplicationComponent
+v 20 DataObject
+v 21 ApplicationService
+v 22 ApplicationComponent
+v 23 ApplicationComponent
+v 24 ApplicationComponent
+v 25 ApplicationFunction
+v 26 ApplicationComponent
+v 27 ApplicationComponent
+v 28 ApplicationFunction
+v 29 DataObject
+v 30 ApplicationService
+v 31 DataObject
+v 32 ApplicationComponent
+v 33 DataObject
+v 34 ApplicationComponent
+v 35 DataObject
+v 36 ApplicationFunction
+v 37 ApplicationService
+v 38 ApplicationService
+v 39 ApplicationComponent
+v 40 ApplicationFunction
+v 41 ApplicationService
+v 42 DataObject
+v 43 TechnologyService
+v 44 SystemSoftware
+v 45 Device
+e 2 3 Serving
+e 2 11 Access
+e 4 3 Assignment
+e 7 5 Serving
+e 7 12 Access
+e 9 8 Serving
+e 9 13 Access
+e 14 15 Assignment
+e 14 17 Composition
+e 15 16 Access
+e 15 18 Realization
+e 17 18 Assignment
+e 19 25 Assignment
+e 19 23 Composition
+e 20 31 Specialization
+e 20 42 Aggregation
+e 20 11 Realization
+e 21 2 Serving
+e 22 20 Access
+e 22 26 Composition
+e 22 27 Composition
+e 22 28 Realization
+e 22 35 Access
+e 22 38 Realization
+e 22 39 Serving
+e 23 19 Serving
+e 25 20 Access
+e 25 21 Realization
+e 25 31 Access
+e 26 29 Access
+e 28 20 Access
+e 28 30 Realization
+e 29 12 Realization
+e 30 2 Serving
+e 32 26 Serving
+e 32 33 Access
+e 33 13 Realization
+e 34 22 Composition
+e 34 36 Assignment
+e 34 38 Realization
+e 35 12 Realization
+e 36 35 Access
+e 36 37 Realization
+e 37 7 Serving
+e 38 32 Triggering
+e 39 22 Association
+e 39 40 Assignment
+e 40 20 Access
+e 40 33 Access
+e 40 41 Realization
+e 41 9 Serving
+e 45 44 Assignment
+e 45 43 Assignment
+t # 001bf72f
+v 1 ApplicationComponent
+v 2 ApplicationComponent
+v 3 ApplicationInterface
+v 4 ApplicationService
+v 5 ApplicationService
+v 6 ApplicationService
+v 7 ApplicationService
+v 8 ApplicationFunction
+v 9 ApplicationComponent
+v 10 ApplicationFunction
+v 11 ApplicationFunction
+v 12 ApplicationFunction
+v 13 ApplicationFunction
+v 14 ApplicationService
+v 15 ApplicationComponent
+v 16 ApplicationComponent
+v 17 ApplicationService
+v 18 ApplicationService
+v 19 ApplicationComponent
+v 20 ApplicationService
+v 21 ApplicationComponent
+v 22 ApplicationFunction
+v 23 ApplicationService
+v 24 ApplicationComponent
+v 25 ApplicationFunction
+v 26 ApplicationService
+v 27 ApplicationComponent
+v 28 ApplicationService
+v 29 ApplicationComponent
+v 30 ApplicationComponent
+v 31 ApplicationService
+v 32 ApplicationService
+v 33 ApplicationFunction
+v 34 ApplicationService
+v 35 ApplicationComponent
+v 36 ApplicationFunction
+v 37 ApplicationService
+v 38 ApplicationService
+v 39 ApplicationComponent
+v 40 ApplicationComponent
+v 41 ApplicationComponent
+v 42 ApplicationComponent
+v 43 ApplicationComponent
+v 44 DataObject
+v 45 ApplicationInterface
+v 46 ApplicationInterface
+v 47 Node
+v 48 Artifact
+v 49 TechnologyService
+v 50 Artifact
+v 51 Artifact
+v 52 Artifact
+v 53 Artifact
+v 54 Artifact
+v 55 Artifact
+v 56 Node
+v 57 Artifact
+v 58 Artifact
+v 59 Artifact
+v 60 Artifact
+v 61 Node
+v 62 Artifact
+e 1 4 Assignment
+e 1 5 Assignment
+e 2 3 Association
+e 2 6 Realization
+e 4 7 Triggering
+e 4 10 Serving
+e 4 11 Serving
+e 4 20 Aggregation
+e 5 6 Triggering
+e 5 11 Serving
+e 7 8 Realization
+e 9 7 Realization
+e 9 52 Association
+e 10 1 Serving
+e 10 13 Aggregation
+e 11 1 Serving
+e 14 13 Serving
+e 15 16 Serving
+e 15 50 Association
+e 15 14 Serving
+e 15 31 Serving
+e 16 14 Realization
+e 17 11 Serving
+e 17 18 Triggering
+e 19 18 Realization
+e 19 51 Association
+e 21 20 Realization
+e 21 50 Association
+e 21 15 Triggering
+e 23 22 Serving
+e 24 23 Realization
+e 26 25 Serving
+e 27 26 Realization
+e 27 53 Association
+e 27 30 Triggering
+e 28 25 Serving
+e 29 28 Realization
+e 30 29 Serving
+e 30 28 Serving
+e 30 32 Serving
+e 31 10 Serving
+e 32 25 Serving
+e 34 33 Serving
+e 35 34 Realization
+e 37 36 Serving
+e 37 38 Triggering
+e 39 38 Realization
+e 40 42 Triggering
+e 40 43 Triggering
+e 40 44 Access
+e 40 45 Composition
+e 40 46 Composition
+e 41 44 Access
+e 44 43 Association
+e 48 1 Serving
+e 53 30 Association
+e 54 40 Serving
+e 54 41 Serving
+e 55 42 Serving
+e 57 40 Serving
+e 58 40 Serving
+e 59 40 Serving
+e 60 40 Serving
+e 62 43 Serving
+t # _YHtXUEZ3EeqonN_RS9oRzw
+v 1 BusinessProcess
+v 2 BusinessProcess
+v 3 BusinessProcess
+v 4 BusinessProcess
+v 5 BusinessProcess
+v 6 BusinessProcess
+v 7 BusinessProcess
+v 8 Product
+v 9 Product
+v 10 Product
+v 11 Product
+v 12 Product
+v 13 Product
+v 14 ApplicationComponent
+v 15 ApplicationComponent
+v 16 ApplicationProcess
+v 17 Product
+v 18 ApplicationComponent
+v 19 ApplicationProcess
+v 20 Product
+v 21 ApplicationComponent
+v 22 ApplicationComponent
+v 23 ApplicationComponent
+v 24 ApplicationComponent
+v 25 ApplicationComponent
+v 26 ApplicationProcess
+v 27 Product
+v 28 ApplicationProcess
+v 29 DataObject
+v 30 ApplicationProcess
+v 31 ApplicationProcess
+v 32 ApplicationProcess
+v 33 ApplicationProcess
+v 34 ApplicationProcess
+v 35 ApplicationProcess
+v 36 ApplicationProcess
+v 37 Product
+v 38 Grouping
+v 39 ApplicationComponent
+v 40 Grouping
+v 41 BusinessActor
+v 42 BusinessActor
+v 43 BusinessActor
+v 44 BusinessInteraction
+v 45 BusinessProcess
+v 46 BusinessProcess
+v 47 BusinessProcess
+v 48 BusinessProcess
+v 49 BusinessProcess
+v 50 BusinessService
+v 51 BusinessProcess
+v 52 BusinessProcess
+v 53 Contract
+v 54 BusinessObject
+v 55 BusinessObject
+v 56 BusinessObject
+v 57 BusinessObject
+v 58 BusinessProcess
+e 1 10 Flow
+e 1 11 Flow
+e 1 12 Flow
+e 1 13 Flow
+e 1 2 Triggering
+e 2 17 Flow
+e 2 3 Triggering
+e 3 4 Triggering
+e 4 5 Triggering
+e 5 6 Triggering
+e 6 7 Triggering
+e 8 1 Flow
+e 8 19 Flow
+e 8 2 Flow
+e 9 1 Flow
+e 9 19 Flow
+e 9 2 Flow
+e 10 30 Flow
+e 14 16 Serving
+e 15 38 Serving
+e 16 2 Realization
+e 17 30 Flow
+e 18 19 Serving
+e 18 32 Serving
+e 19 2 Realization
+e 19 17 Flow
+e 20 2 Flow
+e 20 19 Flow
+e 21 15 Serving
+e 21 14 Serving
+e 21 26 Serving
+e 21 32 Serving
+e 22 21 Serving
+e 22 18 Serving
+e 23 14 Serving
+e 24 14 Serving
+e 25 14 Serving
+e 26 1 Realization
+e 27 3 Flow
+e 27 28 Flow
+e 28 29 Association
+e 28 30 Triggering
+e 30 31 Triggering
+e 31 32 Triggering
+e 32 33 Triggering
+e 33 34 Triggering
+e 34 35 Triggering
+e 35 36 Triggering
+e 37 3 Flow
+e 37 36 Flow
+e 38 3 Realization
+e 38 28 Composition
+e 39 40 Serving
+e 40 2 Specialization
+e 41 44 Assignment
+e 41 46 Assignment
+e 42 44 Serving
+e 43 44 Assignment
+e 44 45 Triggering
+e 45 46 Composition
+e 45 54 Association
+e 45 58 Flow
+e 46 1 Triggering
+e 47 48 Triggering
+e 48 49 Triggering
+e 49 51 Triggering
+e 49 56 Association
+e 50 51 Serving
+e 51 57 Association
+e 52 55 Access
+e 53 54 Association
+e 53 56 Association
+e 53 57 Association
+e 55 54 Aggregation
+e 55 56 Composition
+e 55 57 Composition
+e 58 47 Flow
+t # _DSEjgPdjEeqygJczXaaxEQ
+v 1 BusinessProcess
+v 2 BusinessProcess
+v 3 BusinessProcess
+v 4 BusinessProcess
+v 5 BusinessProcess
+v 6 BusinessProcess
+v 7 BusinessProcess
+v 8 Product
+v 9 Product
+v 10 Product
+v 11 Product
+v 12 Product
+v 13 Product
+v 14 ApplicationComponent
+v 15 ApplicationComponent
+v 16 ApplicationProcess
+v 17 Product
+v 18 ApplicationComponent
+v 19 ApplicationProcess
+v 20 Product
+v 21 ApplicationComponent
+v 22 ApplicationComponent
+v 23 ApplicationComponent
+v 24 ApplicationComponent
+v 25 ApplicationComponent
+v 26 ApplicationProcess
+v 27 Product
+v 28 ApplicationProcess
+v 29 DataObject
+v 30 ApplicationProcess
+v 31 ApplicationProcess
+v 32 ApplicationProcess
+v 33 ApplicationProcess
+v 34 ApplicationProcess
+v 35 ApplicationProcess
+v 36 ApplicationProcess
+v 37 Product
+v 38 Grouping
+v 39 ApplicationComponent
+v 40 Grouping
+v 41 BusinessActor
+v 42 BusinessActor
+v 43 BusinessActor
+v 44 BusinessInteraction
+v 45 BusinessProcess
+v 46 BusinessProcess
+v 47 BusinessProcess
+v 48 BusinessProcess
+v 49 BusinessProcess
+v 50 BusinessService
+v 51 BusinessProcess
+v 52 BusinessProcess
+v 53 Contract
+v 54 BusinessObject
+v 55 BusinessObject
+v 56 BusinessObject
+v 57 BusinessObject
+v 58 BusinessProcess
+e 1 10 Flow
+e 1 11 Flow
+e 1 12 Flow
+e 1 13 Flow
+e 1 2 Triggering
+e 2 17 Flow
+e 2 3 Triggering
+e 3 4 Triggering
+e 4 5 Triggering
+e 5 6 Triggering
+e 6 7 Triggering
+e 8 1 Flow
+e 8 19 Flow
+e 8 2 Flow
+e 9 1 Flow
+e 9 19 Flow
+e 9 2 Flow
+e 10 30 Flow
+e 14 16 Serving
+e 15 38 Serving
+e 16 2 Realization
+e 17 30 Flow
+e 18 19 Serving
+e 18 32 Serving
+e 19 2 Realization
+e 19 17 Flow
+e 20 2 Flow
+e 20 19 Flow
+e 21 15 Serving
+e 21 14 Serving
+e 21 26 Serving
+e 21 32 Serving
+e 22 21 Serving
+e 22 18 Serving
+e 23 14 Serving
+e 24 14 Serving
+e 25 14 Serving
+e 26 1 Realization
+e 27 3 Flow
+e 27 28 Flow
+e 28 29 Association
+e 28 30 Triggering
+e 30 31 Triggering
+e 31 32 Triggering
+e 32 33 Triggering
+e 33 34 Triggering
+e 34 35 Triggering
+e 35 36 Triggering
+e 37 3 Flow
+e 37 36 Flow
+e 38 3 Realization
+e 38 28 Composition
+e 39 40 Serving
+e 40 2 Specialization
+e 41 44 Assignment
+e 41 46 Assignment
+e 42 44 Serving
+e 43 44 Assignment
+e 44 45 Triggering
+e 45 46 Composition
+e 45 54 Association
+e 45 58 Flow
+e 46 1 Triggering
+e 47 48 Triggering
+e 48 49 Triggering
+e 49 51 Triggering
+e 49 56 Association
+e 50 51 Serving
+e 51 57 Association
+e 52 55 Access
+e 53 54 Association
+e 53 56 Association
+e 53 57 Association
+e 55 54 Aggregation
+e 55 56 Composition
+e 55 57 Composition
+e 58 47 Flow
+t # 03f9559e
+v 1 BusinessObject
+v 2 BusinessObject
+v 3 BusinessObject
+v 4 BusinessObject
+v 5 BusinessActor
+v 6 BusinessObject
+v 7 BusinessObject
+v 8 BusinessActor
+v 9 BusinessObject
+v 10 BusinessObject
+v 11 BusinessObject
+v 12 BusinessObject
+v 13 BusinessActor
+v 14 BusinessObject
+v 15 BusinessObject
+v 16 Requirement
+v 17 Requirement
+v 18 Meaning
+v 19 Requirement
+v 20 Requirement
+v 21 Meaning
+v 22 Requirement
+v 23 Requirement
+v 24 Grouping
+v 25 Grouping
+v 26 Grouping
+v 27 Grouping
+v 28 Grouping
+v 29 Grouping
+v 30 Grouping
+v 31 Grouping
+v 32 Grouping
+v 33 Grouping
+v 34 Grouping
+v 35 Grouping
+v 36 Grouping
+v 37 Grouping
+v 38 Grouping
+v 39 Grouping
+v 40 Grouping
+v 41 Grouping
+v 42 Grouping
+v 43 Grouping
+v 44 Grouping
+v 45 Grouping
+v 46 Grouping
+v 47 Grouping
+v 48 Grouping
+v 49 Grouping
+v 50 Grouping
+e 1 25 Association
+e 1 2 Association
+e 2 26 Association
+e 2 3 Association
+e 3 4 Association
+e 3 27 Association
+e 3 1 Association
+e 4 27 Association
+e 5 24 Assignment
+e 6 7 Association
+e 6 29 Association
+e 7 30 Association
+e 7 14 Association
+e 8 28 Assignment
+e 9 32 Association
+e 9 10 Association
+e 10 11 Association
+e 10 33 Association
+e 11 12 Association
+e 11 34 Association
+e 11 9 Association
+e 12 34 Association
+e 13 31 Assignment
+e 14 40 Association
+e 16 24 Association
+e 17 24 Association
+e 17 21 Association
+e 18 28 Association
+e 19 28 Association
+e 20 28 Association
+e 20 21 Association
+e 22 31 Association
+e 23 31 Association
+e 24 2 Composition
+e 24 3 Composition
+e 24 25 Composition
+e 24 26 Composition
+e 24 18 Association
+e 24 27 Composition
+e 24 1 Composition
+e 24 4 Composition
+e 24 36 Composition
+e 25 26 Association
+e 26 27 Association
+e 26 36 Association
+e 26 29 Association
+e 27 25 Association
+e 27 36 Association
+e 28 7 Composition
+e 28 6 Composition
+e 28 29 Composition
+e 28 30 Composition
+e 28 37 Composition
+e 28 39 Composition
+e 28 40 Composition
+e 28 14 Composition
+e 29 30 Association
+e 29 37 Association
+e 30 40 Association
+e 30 37 Association
+e 30 27 Association
+e 31 10 Composition
+e 31 34 Composition
+e 31 32 Composition
+e 31 11 Composition
+e 31 33 Composition
+e 31 12 Composition
+e 31 9 Composition
+e 31 38 Composition
+e 32 33 Association
+e 33 34 Association
+e 33 38 Association
+e 34 32 Association
+e 36 49 Flow
+e 39 50 Flow
+e 40 39 Association
+e 40 33 Association
+e 42 46 Composition
+e 42 44 Association
+e 43 48 Composition
+e 44 45 Association
+e 45 48 Composition
+e 46 47 Association
+e 47 43 Association
+e 49 37 Flow
+e 49 35 Flow
+e 50 38 Flow
+e 50 41 Flow
+t # 33d23ca4
+v 1 ApplicationProcess
+v 2 ApplicationProcess
+v 3 ApplicationProcess
+v 4 ApplicationProcess
+v 5 ApplicationProcess
+v 6 ApplicationProcess
+v 7 ApplicationInterface
+v 8 ApplicationFunction
+v 9 ApplicationFunction
+v 10 ApplicationFunction
+v 11 ApplicationComponent
+v 12 ApplicationFunction
+v 13 ApplicationProcess
+v 14 ApplicationFunction
+v 15 ApplicationProcess
+v 16 ApplicationFunction
+v 17 ApplicationProcess
+v 18 ApplicationComponent
+v 19 DataObject
+v 20 DataObject
+v 21 ApplicationFunction
+v 22 ApplicationProcess
+v 23 ApplicationFunction
+v 24 ApplicationProcess
+v 25 ApplicationFunction
+v 26 ApplicationProcess
+v 27 ApplicationComponent
+v 28 ApplicationFunction
+v 29 ApplicationProcess
+v 30 ApplicationProcess
+v 31 ApplicationComponent
+v 32 ApplicationFunction
+v 33 ApplicationProcess
+v 34 ApplicationProcess
+v 35 DataObject
+v 36 ApplicationFunction
+v 37 ApplicationProcess
+v 38 ApplicationProcess
+v 39 ApplicationFunction
+v 40 ApplicationProcess
+v 41 ApplicationProcess
+v 42 ApplicationProcess
+v 43 ApplicationProcess
+v 44 DataObject
+v 45 DataObject
+v 46 ApplicationFunction
+v 47 ApplicationProcess
+v 48 DataObject
+v 49 DataObject
+v 50 Junction
+v 51 Junction
+v 52 Junction
+e 1 2 Flow
+e 1 35 Association
+e 2 4 Flow
+e 2 3 Composition
+e 4 6 Flow
+e 4 5 Composition
+e 7 9 Association
+e 7 8 Association
+e 7 10 Association
+e 7 45 Access
+e 8 26 Serving
+e 9 1 Serving
+e 9 2 Serving
+e 9 4 Serving
+e 10 6 Serving
+e 10 22 Serving
+e 10 28 Flow
+e 10 21 Flow
+e 11 12 Assignment
+e 11 7 Realization
+e 11 1 Serving
+e 11 14 Assignment
+e 11 16 Assignment
+e 12 13 Composition
+e 14 15 Composition
+e 16 17 Composition
+e 18 25 Assignment
+e 18 21 Assignment
+e 18 7 Realization
+e 18 23 Assignment
+e 18 43 Serving
+e 18 18 Composition
+e 18 44 Access
+e 19 20 Composition
+e 19 4 Association
+e 20 2 Association
+e 20 35 Composition
+e 21 29 Serving
+e 21 22 Composition
+e 21 30 Serving
+e 22 28 Flow
+e 23 24 Composition
+e 25 26 Composition
+e 25 33 Serving
+e 27 2 Serving
+e 27 18 Specialization
+e 27 28 Assignment
+e 27 46 Assignment
+e 27 48 Access
+e 28 29 Composition
+e 28 30 Composition
+e 28 51 Assignment
+e 30 21 Flow
+e 30 46 Flow
+e 31 4 Serving
+e 31 32 Assignment
+e 31 18 Specialization
+e 31 39 Assignment
+e 31 49 Access
+e 32 33 Composition
+e 32 34 Composition
+e 36 37 Composition
+e 36 50 Assignment
+e 36 38 Composition
+e 39 40 Composition
+e 39 52 Assignment
+e 39 41 Composition
+e 39 42 Composition
+e 45 45 Association
+e 46 47 Composition
+e 47 39 Flow
+e 50 38 Triggering
+e 50 37 Triggering
+e 51 29 Triggering
+e 51 30 Triggering
+e 52 41 Triggering
+e 52 40 Triggering
+t # 1aab120d
+v 1 BusinessActor
+v 2 BusinessActor
+v 3 BusinessActor
+v 4 ApplicationFunction
+v 5 ApplicationComponent
+v 6 ApplicationComponent
+v 7 ApplicationComponent
+v 8 ApplicationComponent
+v 9 ApplicationComponent
+v 10 ApplicationComponent
+v 11 ApplicationComponent
+v 12 ApplicationComponent
+v 13 ApplicationComponent
+v 14 ApplicationComponent
+v 15 ApplicationComponent
+v 16 ApplicationComponent
+v 17 ApplicationComponent
+v 18 ApplicationComponent
+v 19 ApplicationComponent
+v 20 ApplicationComponent
+v 21 DataObject
+v 22 DataObject
+v 23 DataObject
+v 24 ApplicationFunction
+v 25 ApplicationFunction
+v 26 ApplicationFunction
+v 27 ApplicationFunction
+v 28 ApplicationFunction
+v 29 ApplicationFunction
+v 30 ApplicationComponent
+v 31 DataObject
+v 32 DataObject
+v 33 DataObject
+v 34 ApplicationFunction
+v 35 ApplicationFunction
+v 36 ApplicationFunction
+v 37 ApplicationComponent
+v 38 ApplicationFunction
+v 39 ApplicationComponent
+v 40 ApplicationFunction
+v 41 ApplicationComponent
+v 42 ApplicationFunction
+v 43 ApplicationInterface
+v 44 ApplicationInterface
+v 45 ApplicationInterface
+e 5 4 Serving
+e 6 5 Serving
+e 7 5 Serving
+e 8 5 Serving
+e 9 8 Serving
+e 9 6 Serving
+e 10 9 Serving
+e 11 9 Serving
+e 12 9 Serving
+e 13 12 Serving
+e 14 13 Serving
+e 15 13 Serving
+e 16 13 Serving
+e 17 21 Access
+e 17 22 Access
+e 17 23 Access
+e 17 24 Assignment
+e 17 25 Assignment
+e 17 26 Assignment
+e 17 43 Realization
+e 17 44 Realization
+e 17 45 Realization
+e 18 27 Assignment
+e 19 28 Assignment
+e 20 29 Assignment
+e 21 18 Association
+e 22 19 Association
+e 23 20 Association
+e 24 27 Flow
+e 25 28 Flow
+e 26 29 Flow
+e 30 34 Assignment
+e 30 31 Access
+e 30 36 Assignment
+e 30 32 Access
+e 30 33 Access
+e 30 35 Assignment
+e 31 37 Association
+e 32 39 Association
+e 33 41 Association
+e 34 38 Flow
+e 35 40 Flow
+e 36 42 Flow
+e 37 38 Assignment
+e 39 40 Assignment
+e 41 42 Assignment
+e 43 1 Serving
+e 44 2 Serving
+e 45 3 Serving
+t # 18975096
+v 1 BusinessRole
+v 2 Product
+v 3 BusinessObject
+v 4 BusinessCollaboration
+v 5 BusinessCollaboration
+v 6 BusinessRole
+v 7 BusinessRole
+v 8 BusinessService
+v 9 Product
+v 10 BusinessProcess
+v 11 BusinessService
+v 12 BusinessActor
+v 13 Product
+v 14 Product
+v 15 Product
+v 16 BusinessActor
+v 17 BusinessActor
+v 18 BusinessActor
+v 19 BusinessObject
+v 20 Product
+v 21 ApplicationService
+v 22 ApplicationService
+v 23 ApplicationFunction
+v 24 ApplicationFunction
+v 25 ApplicationService
+v 26 ApplicationFunction
+v 27 ApplicationComponent
+v 28 ApplicationComponent
+v 29 ApplicationComponent
+v 30 ApplicationComponent
+v 31 ApplicationComponent
+v 32 ApplicationService
+v 33 ApplicationInterface
+v 34 ApplicationInterface
+v 35 ApplicationInteraction
+v 36 DataObject
+v 37 DataObject
+v 38 ApplicationComponent
+v 39 ApplicationService
+v 40 ApplicationFunction
+v 41 ApplicationInterface
+v 42 ApplicationInteraction
+v 43 ApplicationService
+v 44 ApplicationInterface
+v 45 ApplicationComponent
+v 46 DataObject
+v 47 ApplicationComponent
+v 48 ApplicationService
+v 49 ApplicationInterface
+v 50 ApplicationInteraction
+v 51 ApplicationFunction
+v 52 ApplicationService
+v 53 ApplicationFunction
+v 54 ApplicationComponent
+v 55 ApplicationService
+e 2 1 Serving
+e 2 21 Aggregation
+e 2 25 Aggregation
+e 2 22 Aggregation
+e 2 9 Association
+e 2 39 Composition
+e 2 15 Association
+e 2 17 Serving
+e 5 1 Aggregation
+e 8 6 Serving
+e 9 6 Serving
+e 9 7 Serving
+e 9 11 Aggregation
+e 9 12 Serving
+e 9 2 Aggregation
+e 10 8 Realization
+e 10 11 Flow
+e 11 3 Access
+e 13 36 Composition
+e 13 43 Composition
+e 13 44 Realization
+e 14 2 Specialization
+e 14 22 Composition
+e 14 34 Realization
+e 14 52 Composition
+e 14 16 Association
+e 14 24 Realization
+e 14 53 Realization
+e 15 23 Realization
+e 15 26 Realization
+e 15 40 Realization
+e 15 46 Composition
+e 17 12 Specialization
+e 18 12 Specialization
+e 19 9 Association
+e 19 6 Association
+e 20 54 Realization
+e 21 22 Serving
+e 21 25 Serving
+e 21 39 Serving
+e 22 34 Serving
+e 23 21 Realization
+e 23 26 Serving
+e 23 24 Serving
+e 23 40 Serving
+e 24 22 Realization
+e 25 39 Serving
+e 25 48 Serving
+e 26 25 Realization
+e 26 40 Serving
+e 26 51 Composition
+e 27 28 Composition
+e 27 31 Composition
+e 27 37 Access
+e 27 41 Composition
+e 27 47 Composition
+e 27 33 Composition
+e 27 49 Composition
+e 27 45 Composition
+e 28 29 Composition
+e 28 30 Composition
+e 29 30 Flow
+e 31 38 Composition
+e 31 41 Serving
+e 32 33 Serving
+e 34 50 Association
+e 35 34 Association
+e 35 33 Association
+e 39 38 Serving
+e 40 39 Realization
+e 40 46 Access
+e 41 37 Access
+e 42 41 Association
+e 43 44 Serving
+e 44 36 Access
+e 44 42 Association
+e 45 29 Composition
+e 45 30 Composition
+e 47 48 Assignment
+e 47 32 Assignment
+e 48 49 Serving
+e 49 50 Association
+e 53 51 Association
+e 54 55 Assignment
+e 55 42 Association
+t # 059db8b6
+v 1 ApplicationInterface
+v 2 ApplicationInterface
+v 3 ApplicationService
+v 4 ApplicationService
+v 5 ApplicationService
+v 6 ApplicationService
+v 7 ApplicationService
+v 8 ApplicationService
+v 9 ApplicationInterface
+v 10 ApplicationFunction
+v 11 ApplicationInterface
+v 12 ApplicationInterface
+v 13 ApplicationInterface
+v 14 DataObject
+v 15 DataObject
+v 16 DataObject
+v 17 DataObject
+v 18 DataObject
+v 19 DataObject
+v 20 ApplicationInterface
+v 21 ApplicationComponent
+v 22 ApplicationComponent
+v 23 ApplicationComponent
+v 24 ApplicationComponent
+v 25 ApplicationComponent
+v 26 ApplicationComponent
+v 27 ApplicationComponent
+v 28 ApplicationComponent
+v 29 ApplicationComponent
+v 30 Node
+v 31 SystemSoftware
+v 32 SystemSoftware
+v 33 SystemSoftware
+v 34 SystemSoftware
+v 35 SystemSoftware
+v 36 SystemSoftware
+v 37 SystemSoftware
+v 38 Device
+v 39 SystemSoftware
+v 40 Device
+v 41 Device
+v 42 Device
+v 43 Device
+v 44 SystemSoftware
+v 45 SystemSoftware
+v 46 SystemSoftware
+v 47 SystemSoftware
+v 48 SystemSoftware
+v 49 SystemSoftware
+v 50 SystemSoftware
+v 51 SystemSoftware
+v 52 SystemSoftware
+v 53 SystemSoftware
+v 54 SystemSoftware
+v 55 SystemSoftware
+v 56 SystemSoftware
+e 4 44 Association
+e 5 44 Association
+e 6 44 Association
+e 7 44 Association
+e 9 48 Association
+e 9 52 Association
+e 10 48 Association
+e 11 46 Association
+e 12 48 Association
+e 12 52 Association
+e 13 20 Association
+e 13 47 Association
+e 13 52 Association
+e 14 16 Association
+e 14 19 Association
+e 15 17 Association
+e 15 19 Association
+e 16 18 Association
+e 18 17 Association
+e 20 6 Association
+e 20 7 Association
+e 31 3 Association
+e 31 6 Association
+e 33 34 Association
+e 35 3 Association
+e 35 34 Association
+e 36 31 Association
+e 38 39 Composition
+e 38 40 Composition
+e 38 41 Composition
+e 38 42 Composition
+e 39 3 Association
+e 39 4 Association
+e 42 40 Association
+e 42 41 Association
+e 42 39 Composition
+e 43 42 Association
+e 43 56 Composition
+e 44 45 Association
+e 44 33 Association
+e 44 36 Association
+e 47 49 Association
+e 48 47 Association
+e 48 5 Association
+e 48 50 Association
+e 51 49 Composition
+e 53 45 Association
+e 54 44 Association
+e 55 34 Association
+t # id-104ef6677b314ceeb33d39418722980c
+v 1 BusinessObject
+v 2 BusinessObject
+v 3 BusinessObject
+v 4 BusinessObject
+v 5 ApplicationComponent
+v 6 ApplicationComponent
+v 7 ApplicationComponent
+v 8 ApplicationComponent
+v 9 ApplicationComponent
+v 10 ApplicationComponent
+v 11 ApplicationComponent
+v 12 ApplicationComponent
+v 13 ApplicationComponent
+v 14 ApplicationComponent
+v 15 ApplicationComponent
+v 16 ApplicationComponent
+v 17 ApplicationComponent
+v 18 ApplicationComponent
+v 19 ApplicationComponent
+v 20 ApplicationComponent
+v 21 DataObject
+v 22 DataObject
+v 23 DataObject
+v 24 DataObject
+v 25 DataObject
+v 26 DataObject
+v 27 Stakeholder
+v 28 Stakeholder
+v 29 Stakeholder
+v 30 Stakeholder
+v 31 Stakeholder
+v 32 Stakeholder
+v 33 Stakeholder
+v 34 Driver
+v 35 Driver
+v 36 Driver
+v 37 Driver
+v 38 Driver
+v 39 Driver
+v 40 Driver
+v 41 Driver
+v 42 Driver
+v 43 Driver
+v 44 Driver
+v 45 Driver
+v 46 Driver
+v 47 Goal
+v 48 Goal
+v 49 Goal
+v 50 Goal
+v 51 Goal
+v 52 Goal
+v 53 Goal
+v 54 Goal
+v 55 Goal
+v 56 Goal
+v 57 Goal
+v 58 Goal
+v 59 Goal
+v 60 Goal
+v 61 Goal
+v 62 Goal
+v 63 Principle
+v 64 Principle
+v 65 Principle
+v 66 Principle
+v 67 Principle
+v 68 Principle
+v 69 Principle
+v 70 Principle
+e 2 3 Aggregation
+e 2 4 Aggregation
+e 7 5 Serving
+e 7 6 Serving
+e 8 5 Serving
+e 8 6 Serving
+e 9 5 Serving
+e 9 6 Serving
+e 10 14 Serving
+e 10 15 Serving
+e 10 13 Triggering
+e 10 18 Serving
+e 10 19 Triggering
+e 10 17 Triggering
+e 13 15 Serving
+e 13 12 Serving
+e 13 11 Serving
+e 14 16 Serving
+e 15 12 Serving
+e 15 7 Serving
+e 15 9 Serving
+e 15 11 Serving
+e 17 9 Serving
+e 18 9 Triggering
+e 19 9 Serving
+e 20 25 Access
+e 20 22 Access
+e 20 24 Access
+e 20 21 Access
+e 20 26 Access
+e 20 23 Access
+e 22 1 Realization
+e 23 1 Realization
+e 23 3 Realization
+e 24 4 Realization
+e 25 4 Realization
+e 26 23 Specialization
+e 34 27 Association
+e 35 28 Association
+e 36 29 Association
+e 36 30 Association
+e 36 43 Aggregation
+e 37 30 Association
+e 37 31 Association
+e 37 58 Association
+e 37 57 Association
+e 38 31 Association
+e 38 54 Association
+e 39 31 Association
+e 39 52 Association
+e 39 55 Association
+e 39 49 Association
+e 40 32 Association
+e 41 32 Association
+e 42 44 Influence
+e 43 45 Aggregation
+e 43 46 Aggregation
+e 43 44 Aggregation
+e 43 41 Influence
+e 45 54 Association
+e 47 46 Association
+e 47 48 Aggregation
+e 48 49 Aggregation
+e 48 40 Influence
+e 49 51 Aggregation
+e 49 50 Aggregation
+e 52 58 Influence
+e 52 49 Influence
+e 53 54 Influence
+e 54 57 Aggregation
+e 54 55 Aggregation
+e 54 56 Aggregation
+e 58 60 Aggregation
+e 60 62 Aggregation
+e 61 58 Influence
+e 63 50 Realization
+e 63 51 Realization
+e 64 55 Realization
+e 65 56 Realization
+e 65 57 Realization
+e 66 61 Realization
+e 66 57 Realization
+e 67 61 Realization
+e 68 60 Realization
+e 69 62 Realization
+e 70 62 Realization
+t # b6a6603d-4755-433b-ad0f-d71b119f6f8d
+v 1 BusinessActor
+v 2 ApplicationFunction
+v 3 ApplicationFunction
+v 4 ApplicationFunction
+v 5 ApplicationFunction
+v 6 ApplicationFunction
+v 7 ApplicationProcess
+v 8 ApplicationProcess
+v 9 ApplicationProcess
+v 10 ApplicationFunction
+v 11 ApplicationProcess
+v 12 ApplicationProcess
+v 13 ApplicationFunction
+v 14 ApplicationProcess
+v 15 ApplicationProcess
+v 16 ApplicationFunction
+v 17 ApplicationProcess
+v 18 ApplicationProcess
+v 19 ApplicationProcess
+v 20 ApplicationProcess
+v 21 ApplicationFunction
+v 22 ApplicationProcess
+v 23 ApplicationFunction
+v 24 ApplicationEvent
+v 25 ApplicationEvent
+v 26 ApplicationProcess
+v 27 ApplicationProcess
+v 28 ApplicationProcess
+v 29 ApplicationProcess
+v 30 ApplicationProcess
+v 31 ApplicationFunction
+v 32 ApplicationProcess
+v 33 ApplicationProcess
+v 34 ApplicationProcess
+v 35 ApplicationProcess
+v 36 ApplicationProcess
+v 37 ApplicationProcess
+v 38 ApplicationEvent
+v 39 ApplicationEvent
+v 40 ApplicationProcess
+v 41 ApplicationProcess
+v 42 ApplicationProcess
+v 43 Node
+v 44 SystemSoftware
+v 45 Node
+v 46 Path
+v 47 Path
+v 48 TechnologyProcess
+v 49 TechnologyProcess
+v 50 Path
+v 51 Path
+v 52 Requirement
+v 53 Junction
+v 54 Junction
+v 55 Grouping
+e 1 38 Triggering
+e 2 6 Triggering
+e 3 53 Triggering
+e 4 11 Serving
+e 5 19 Serving
+e 6 7 Triggering
+e 7 46 Association
+e 7 8 Triggering
+e 8 46 Association
+e 8 9 Triggering
+e 9 48 Flow
+e 9 12 Triggering
+e 10 3 Triggering
+e 11 49 Flow
+e 13 12 Serving
+e 13 18 Triggering
+e 14 1 Flow
+e 16 15 Serving
+e 16 32 Composition
+e 16 33 Composition
+e 16 34 Composition
+e 16 35 Composition
+e 16 36 Composition
+e 16 37 Composition
+e 16 26 Composition
+e 16 27 Composition
+e 16 40 Composition
+e 16 41 Composition
+e 16 42 Composition
+e 17 49 Flow
+e 17 30 Triggering
+e 17 28 Triggering
+e 18 54 Triggering
+e 19 50 Association
+e 19 22 Triggering
+e 20 49 Flow
+e 20 17 Triggering
+e 21 17 Serving
+e 22 20 Triggering
+e 22 50 Association
+e 23 29 Serving
+e 23 30 Serving
+e 24 37 Triggering
+e 25 36 Triggering
+e 26 27 Triggering
+e 26 39 Triggering
+e 27 25 Triggering
+e 27 40 Triggering
+e 28 29 Triggering
+e 28 17 Triggering
+e 29 49 Flow
+e 30 49 Flow
+e 31 4 Serving
+e 32 51 Flow
+e 32 16 Triggering
+e 32 33 Triggering
+e 32 24 Triggering
+e 33 55 Flow
+e 33 26 Triggering
+e 33 52 Realization
+e 34 51 Association
+e 34 41 Triggering
+e 35 55 Flow
+e 35 34 Triggering
+e 36 35 Triggering
+e 37 55 Flow
+e 37 34 Triggering
+e 38 2 Triggering
+e 39 34 Triggering
+e 40 32 Triggering
+e 40 34 Triggering
+e 40 42 Triggering
+e 41 1 Flow
+e 42 26 Triggering
+e 43 2 Serving
+e 44 46 Serving
+e 44 47 Serving
+e 44 50 Serving
+e 45 10 Serving
+e 46 49 Assignment
+e 47 48 Assignment
+e 48 10 Triggering
+e 49 12 Flow
+e 49 26 Flow
+e 50 55 Composition
+e 51 1 Flow
+e 53 11 Triggering
+e 53 5 Triggering
+e 54 14 Triggering
+e 54 15 Triggering
+e 55 28 Flow
+t # fc035d09
+v 1 ApplicationComponent
+v 2 ApplicationComponent
+v 3 ApplicationComponent
+v 4 ApplicationComponent
+v 5 ApplicationFunction
+v 6 ApplicationProcess
+v 7 ApplicationProcess
+v 8 ApplicationProcess
+v 9 ApplicationComponent
+v 10 DataObject
+v 11 ApplicationProcess
+v 12 ApplicationProcess
+v 13 ApplicationProcess
+v 14 ApplicationProcess
+v 15 ApplicationProcess
+v 16 DataObject
+v 17 DataObject
+v 18 ApplicationComponent
+v 19 ApplicationInterface
+v 20 ApplicationComponent
+v 21 ApplicationFunction
+v 22 ApplicationEvent
+v 23 ApplicationFunction
+v 24 ApplicationFunction
+v 25 ApplicationProcess
+v 26 ApplicationProcess
+v 27 ApplicationProcess
+v 28 ApplicationProcess
+v 29 ApplicationProcess
+v 30 ApplicationProcess
+v 31 ApplicationFunction
+v 32 ApplicationFunction
+v 33 ApplicationComponent
+v 34 ApplicationFunction
+v 35 ApplicationFunction
+v 36 ApplicationFunction
+v 37 ApplicationComponent
+v 38 ApplicationFunction
+v 39 ApplicationProcess
+v 40 ApplicationProcess
+v 41 ApplicationProcess
+v 42 ApplicationFunction
+v 43 ApplicationProcess
+v 44 ApplicationProcess
+v 45 ApplicationProcess
+v 46 ApplicationComponent
+v 47 ApplicationInterface
+v 48 DataObject
+v 49 ApplicationComponent
+v 50 ApplicationComponent
+v 51 ApplicationProcess
+v 52 ApplicationProcess
+v 53 ApplicationProcess
+v 54 ApplicationProcess
+v 55 ApplicationProcess
+v 56 ApplicationComponent
+v 57 DataObject
+v 58 ApplicationInterface
+v 59 ApplicationInterface
+v 60 DataObject
+v 61 DataObject
+v 62 ApplicationInterface
+v 63 DataObject
+v 64 ApplicationComponent
+v 65 DataObject
+v 66 DataObject
+v 67 DataObject
+v 68 ApplicationInterface
+v 69 ApplicationComponent
+v 70 ApplicationFunction
+v 71 ApplicationFunction
+v 72 ApplicationFunction
+v 73 ApplicationInterface
+v 74 ApplicationFunction
+v 75 ApplicationFunction
+v 76 ApplicationFunction
+v 77 ApplicationComponent
+v 78 ApplicationInterface
+v 79 ApplicationFunction
+v 80 ApplicationFunction
+v 81 DataObject
+v 82 ApplicationInterface
+v 83 DataObject
+v 84 ApplicationInterface
+v 85 DataObject
+v 86 ApplicationFunction
+v 87 ApplicationFunction
+v 88 ApplicationFunction
+v 89 ApplicationFunction
+v 90 ApplicationFunction
+v 91 ApplicationFunction
+v 92 ApplicationFunction
+v 93 ApplicationFunction
+v 94 ApplicationComponent
+v 95 DataObject
+v 96 ApplicationFunction
+v 97 Node
+v 98 Constraint
+v 99 Grouping
+v 100 Grouping
+e 2 3 Flow
+e 2 1 Flow
+e 4 5 Assignment
+e 6 7 Composition
+e 6 8 Composition
+e 7 14 Flow
+e 7 8 Flow
+e 8 2 Flow
+e 9 99 Flow
+e 9 15 Assignment
+e 9 14 Assignment
+e 9 11 Assignment
+e 9 13 Assignment
+e 9 10 Access
+e 9 12 Assignment
+e 9 18 Realization
+e 9 19 Realization
+e 14 32 Flow
+e 20 21 Assignment
+e 20 32 Assignment
+e 23 25 Composition
+e 23 26 Composition
+e 23 27 Composition
+e 24 7 Composition
+e 24 8 Composition
+e 28 30 Flow
+e 28 21 Flow
+e 30 11 Flow
+e 31 28 Composition
+e 31 30 Composition
+e 33 34 Assignment
+e 33 35 Assignment
+e 33 36 Assignment
+e 35 34 Flow
+e 37 38 Assignment
+e 37 42 Assignment
+e 38 39 Composition
+e 38 40 Composition
+e 38 41 Composition
+e 39 97 Flow
+e 39 40 Flow
+e 40 41 Flow
+e 41 35 Flow
+e 42 43 Composition
+e 42 44 Flow
+e 42 45 Composition
+e 43 36 Flow
+e 43 44 Flow
+e 44 45 Flow
+e 45 97 Flow
+e 47 48 Access
+e 49 51 Assignment
+e 50 47 Realization
+e 51 52 Composition
+e 51 54 Composition
+e 51 55 Composition
+e 52 53 Composition
+e 56 57 Access
+e 56 96 Assignment
+e 58 57 Association
+e 59 60 Access
+e 59 61 Access
+e 62 63 Access
+e 62 59 Specialization
+e 64 65 Access
+e 64 66 Access
+e 64 67 Access
+e 64 62 Realization
+e 69 64 Association
+e 73 68 Specialization
+e 77 78 Realization
+e 77 81 Access
+e 78 73 Specialization
+e 81 64 Association
+e 82 83 Access
+e 83 68 Association
+e 84 82 Specialization
+e 84 85 Access
+e 85 73 Association
+e 94 58 Realization
+e 94 84 Realization
+e 94 95 Access
+e 95 78 Association
+e 96 92 Triggering
+e 98 99 Association
+e 99 2 Composition
+e 99 1 Composition
+e 99 3 Composition
+e 99 19 Composition
+e 100 33 Composition

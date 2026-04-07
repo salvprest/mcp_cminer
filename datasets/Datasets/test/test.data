@@ -1,0 +1,1831 @@
+t # lindeberg2022full-ontorights
+v 1 event
+v 2 situation
+v 3 quality
+v 4 event
+v 5 event
+v 6 event
+v 7 event
+v 8 kind
+v 9 kind
+v 10 subkind
+v 11 subkind
+v 12 event
+v 13 mode
+v 14 situation
+v 15 event
+v 16 situation
+v 17 situation
+v 18 relator
+v 19 roleMixin
+v 20 roleMixin
+v 21 category
+v 22 category
+v 23 category
+v 24 category
+v 25 category
+v 26 category
+v 27 kind
+v 28 roleMixin
+v 29 mode
+v 30 subkind
+v 31 mode
+v 32 subkind
+v 33 subkind
+v 34 subkind
+v 35 subkind
+v 36 subkind
+v 37 subkind
+v 38 event
+v 39 mode
+v 40 mode
+v 41 mode
+v 42 quality
+v 43 phase
+v 44 phase
+v 45 phase
+v 46 phase
+v 47 mode
+v 48 mode
+v 49 quality
+v 50 subkind
+v 51 subkind
+v 52 subkind
+v 53 subkind
+v 54 subkind
+v 55 subkind
+v 56 subkind
+v 57 subkind
+v 58 event
+v 59 kind
+v 60 event
+v 61 category
+v 62 mode
+v 63 mode
+v 64 subkind
+v 65 subkind
+v 66 mode
+v 67 event
+v 68 kind
+v 69 kind
+v 70 kind
+v 71 category
+v 72 category
+v 73 kind
+v 74 subkind
+v 75 subkind
+v 76 relator
+v 77 subkind
+v 78 subkind
+v 79 subkind
+v 80 subkind
+v 81 subkind
+v 82 subkind
+v 83 subkind
+v 84 subkind
+v 85 subkind
+v 86 subkind
+v 87 subkind
+v 88 subkind
+v 89 situation
+v 90 situation
+v 91 situation
+v 92 category
+v 93 roleMixin
+v 94 subkind
+v 95 subkind
+v 96 subkind
+v 97 kind
+v 98 phase
+v 99 event
+v 100 subkind
+v 101 subkind
+v 102 subkind
+v 103 subkind
+v 104 kind
+v 105 subkind
+v 106 subkind
+v 107 role
+v 108 relator
+v 109 role
+v 110 role
+v 111 subkind
+v 112 subkind
+v 113 event
+v 114 event
+v 115 relator
+v 116 kind
+v 117 event
+v 118 quality
+v 119 subkind
+v 120 kind
+v 121 quality
+v 122 role
+v 123 phase
+v 124 phase
+v 125 phase
+v 126 subkind
+v 127 subkind
+v 128 subkind
+v 129 subkind
+v 130 subkind
+v 131 kind
+v 132 category
+v 133 subkind
+v 134 roleMixin
+v 135 category
+v 136 kind
+v 137 kind
+v 138 None
+v 139 None
+v 140 None
+v 141 category
+v 142 category
+v 143 category
+v 144 kind
+v 145 kind
+v 146 subkind
+v 147 role
+v 148 role
+v 149 role
+v 150 role
+v 151 role
+v 152 role
+v 153 subkind
+v 154 subkind
+v 155 subkind
+v 156 relator
+v 157 relator
+v 158 relator
+v 159 mode
+v 160 kind
+v 161 category
+v 162 kind
+v 163 roleMixin
+v 164 roleMixin
+v 165 phase
+v 166 event
+v 167 category
+v 168 subkind
+v 169 subkind
+v 170 None
+v 171 relator
+v 172 relator
+v 173 situation
+v 174 subkind
+v 175 subkind
+v 176 subkind
+v 177 subkind
+v 178 subkind
+v 179 kind
+v 180 roleMixin
+v 181 role
+v 182 role
+v 183 situation
+v 184 subkind
+v 185 subkind
+v 186 subkind
+v 187 subkind
+v 188 relator
+v 189 subkind
+v 190 subkind
+e 1 2 bringsAbout
+e 1 1 bringsAbout
+e 1 120 comparative
+e 1 145 creation
+e 2 16 Generalization
+e 2 1 triggers
+e 3 1 characterization
+e 3 2 characterization
+e 4 1 componentOf
+e 5 1 Generalization
+e 6 1 Generalization
+e 7 6 Generalization
+e 7 99 Generalization
+e 8 6 componentOf
+e 8 21 material
+e 9 6 componentOf
+e 9 8 material
+e 10 8 Generalization
+e 10 56 componentOf
+e 11 9 Generalization
+e 12 1 Generalization
+e 13 12 bringsAbout
+e 13 14 characterization
+e 13 132 characterization
+e 14 17 Generalization
+e 14 2 comparative
+e 15 1 Generalization
+e 16 120 comparative
+e 17 16 Generalization
+e 18 134 mediation
+e 19 163 Generalization
+e 19 28 mediation
+e 20 134 Generalization
+e 20 19 material
+e 21 25 Generalization
+e 22 21 Generalization
+e 22 161 Generalization
+e 22 23 componentOf
+e 23 21 Generalization
+e 23 24 material
+e 23 8 material
+e 24 132 Generalization
+e 25 132 Generalization
+e 25 8 material
+e 26 25 Generalization
+e 27 26 Generalization
+e 28 21 Generalization
+e 29 19 characterization
+e 30 31 Generalization
+e 30 131 characterization
+e 31 89 characterization
+e 32 31 Generalization
+e 33 31 Generalization
+e 33 26 characterization
+e 34 31 Generalization
+e 35 31 Generalization
+e 36 31 Generalization
+e 37 31 Generalization
+e 38 15 Generalization
+e 38 90 bringsAbout
+e 39 131 characterization
+e 40 131 characterization
+e 41 131 characterization
+e 42 131 characterization
+e 43 131 Generalization
+e 44 131 Generalization
+e 45 131 Generalization
+e 46 131 Generalization
+e 47 131 characterization
+e 48 131 characterization
+e 49 131 characterization
+e 50 31 Generalization
+e 51 31 Generalization
+e 52 31 Generalization
+e 53 111 Generalization
+e 54 136 Generalization
+e 55 136 Generalization
+e 56 8 Generalization
+e 57 11 Generalization
+e 58 15 Generalization
+e 58 2 material
+e 58 116 comparative
+e 59 58 componentOf
+e 59 99 material
+e 59 115 componentOf
+e 60 58 Generalization
+e 62 60 characterization
+e 62 63 characterization
+e 63 60 characterization
+e 64 31 Generalization
+e 65 64 Generalization
+e 66 60 characterization
+e 67 60 Generalization
+e 68 72 Generalization
+e 69 71 Generalization
+e 70 71 Generalization
+e 71 61 Generalization
+e 72 61 Generalization
+e 72 71 comparative
+e 73 72 Generalization
+e 73 68 None
+e 73 73 None
+e 74 116 Generalization
+e 75 116 Generalization
+e 76 132 mediation
+e 77 76 Generalization
+e 78 76 Generalization
+e 79 78 Generalization
+e 80 78 Generalization
+e 81 76 Generalization
+e 82 76 Generalization
+e 83 76 Generalization
+e 84 83 Generalization
+e 85 83 Generalization
+e 86 82 Generalization
+e 87 82 Generalization
+e 88 82 Generalization
+e 89 16 Generalization
+e 90 89 Generalization
+e 91 183 Generalization
+e 92 15 participation
+e 93 92 Generalization
+e 93 17 material
+e 94 9 Generalization
+e 95 9 Generalization
+e 96 111 Generalization
+e 96 21 Generalization
+e 97 161 Generalization
+e 97 53 componentOf
+e 98 18 Generalization
+e 98 20 mediation
+e 98 19 mediation
+e 98 96 mediation
+e 99 1 Generalization
+e 99 11 material
+e 99 7 comparative
+e 99 98 mediation
+e 100 160 componentOf
+e 101 160 Generalization
+e 102 101 Generalization
+e 102 104 None
+e 103 101 Generalization
+e 104 161 Generalization
+e 104 107 memberOf
+e 104 119 material
+e 105 104 None
+e 106 104 Generalization
+e 107 131 Generalization
+e 108 107 mediation
+e 108 160 mediation
+e 109 107 Generalization
+e 110 107 Generalization
+e 111 160 memberOf
+e 112 31 Generalization
+e 113 38 Generalization
+e 113 61 creation
+e 114 12 Generalization
+e 114 142 creation
+e 114 189 termination
+e 115 99 mediation
+e 115 11 mediation
+e 115 98 mediation
+e 116 142 Generalization
+e 117 58 Generalization
+e 118 131 characterization
+e 119 120 Generalization
+e 121 120 characterization
+e 122 119 Generalization
+e 123 98 Generalization
+e 124 98 Generalization
+e 125 98 Generalization
+e 126 29 Generalization
+e 127 29 Generalization
+e 128 120 componentOf
+e 129 120 Generalization
+e 130 160 Generalization
+e 131 24 Generalization
+e 131 131 material
+e 131 120 comparative
+e 132 92 Generalization
+e 132 132 material
+e 132 89 material
+e 132 120 comparative
+e 133 130 Generalization
+e 134 25 Generalization
+e 134 28 material
+e 135 26 memberOf
+e 136 135 Generalization
+e 137 135 Generalization
+e 141 92 Generalization
+e 142 141 Generalization
+e 142 16 componentOf
+e 143 142 Generalization
+e 143 92 material
+e 144 143 Generalization
+e 144 145 componentOf
+e 144 144 material
+e 145 143 Generalization
+e 145 190 creation
+e 146 31 Generalization
+e 147 131 Generalization
+e 147 58 participation
+e 147 25 material
+e 148 147 Generalization
+e 149 147 Generalization
+e 150 147 Generalization
+e 151 147 Generalization
+e 152 147 Generalization
+e 153 29 Generalization
+e 154 29 Generalization
+e 155 29 Generalization
+e 156 131 mediation
+e 156 26 mediation
+e 157 144 mediation
+e 158 1 mediation
+e 159 131 characterization
+e 160 161 Generalization
+e 160 119 material
+e 161 25 Generalization
+e 162 161 Generalization
+e 163 28 Generalization
+e 164 28 Generalization
+e 165 18 Generalization
+e 166 60 Generalization
+e 167 61 Generalization
+e 168 157 Generalization
+e 169 157 Generalization
+e 171 107 mediation
+e 171 104 mediation
+e 172 131 mediation
+e 173 16 Generalization
+e 173 122 comparative
+e 174 178 Generalization
+e 175 178 Generalization
+e 176 178 Generalization
+e 177 178 Generalization
+e 178 31 Generalization
+e 179 116 componentOf
+e 179 167 componentOf
+e 180 122 material
+e 181 131 Generalization
+e 181 180 Generalization
+e 182 137 Generalization
+e 182 180 Generalization
+e 183 89 Generalization
+e 184 172 Generalization
+e 185 184 Generalization
+e 186 184 Generalization
+e 187 172 Generalization
+e 188 180 mediation
+e 188 122 mediation
+e 189 188 Generalization
+e 190 188 Generalization
+t # abrahao2018agriculture-operations
+v 1 stringNominalStructure
+v 2 kind
+v 3 category
+v 4 relator
+v 5 kind
+v 6 nonPerceivableQuality
+v 7 category
+v 8 kind
+v 9 subkind
+v 10 subkind
+v 11 kind
+v 12 kind
+v 13 category
+v 14 relator
+v 15 kind
+v 16 relator
+v 17 relator
+v 18 kind
+v 19 kind
+v 20 relator
+v 21 relator
+v 22 kind
+e 1 2 None
+e 2 3 Generalization
+e 2 11 material
+e 2 19 material
+e 3 7 None
+e 3 22 None
+e 4 5 mediation
+e 4 2 mediation
+e 5 2 material
+e 6 1 structuration
+e 6 2 None
+e 6 8 characterization
+e 7 13 None
+e 7 22 None
+e 8 13 Generalization
+e 8 5 componentOf
+e 9 8 Generalization
+e 10 8 Generalization
+e 11 13 Generalization
+e 11 10 None
+e 11 5 componentOf
+e 11 8 None
+e 11 21 None
+e 12 13 Generalization
+e 12 9 None
+e 12 10 None
+e 12 11 componentOf
+e 12 8 None
+e 12 16 None
+e 13 22 None
+e 14 7 Generalization
+e 14 12 None
+e 14 11 None
+e 14 15 None
+e 15 3 Generalization
+e 15 12 material
+e 15 11 material
+e 15 19 material
+e 15 17 None
+e 16 7 Generalization
+e 16 18 None
+e 16 15 None
+e 16 17 None
+e 17 7 Generalization
+e 17 18 None
+e 18 3 Generalization
+e 18 12 material
+e 18 19 material
+e 19 13 Generalization
+e 19 17 None
+e 19 20 None
+e 20 7 Generalization
+e 20 15 None
+e 20 2 None
+e 21 7 Generalization
+e 21 20 None
+e 21 15 None
+e 21 2 None
+t # eu-rent-refactored2022
+v 1 kind
+v 2 subkind
+v 3 subkind
+v 4 role
+v 5 relator
+v 6 phase
+v 7 phase
+v 8 phase
+v 9 phase
+v 10 phase
+v 11 roleMixin
+v 12 role
+v 13 subkind
+v 14 relator
+v 15 role
+v 16 kind
+v 17 subkind
+v 18 subkind
+v 19 kind
+v 20 relator
+v 21 role
+v 22 phase
+v 23 phase
+v 24 phase
+v 25 subkind
+v 26 subkind
+v 27 role
+v 28 role
+v 29 relator
+v 30 relator
+v 31 relator
+v 32 phase
+v 33 phase
+v 34 phase
+v 35 role
+v 36 relator
+v 37 subkind
+v 38 role
+v 39 relator
+v 40 role
+v 41 phase
+v 42 phase
+v 43 mixin
+v 44 subkind
+v 45 subkind
+v 46 relator
+v 47 role
+v 48 role
+v 49 kind
+v 50 phase
+v 51 phase
+v 52 relator
+v 53 role
+v 54 role
+v 55 relator
+v 56 role
+v 57 relator
+v 58 role
+v 59 role
+v 60 role
+v 61 role
+v 62 role
+v 63 relator
+v 64 role
+v 65 role
+v 66 relator
+e 2 1 Generalization
+e 3 1 Generalization
+e 4 1 Generalization
+e 4 4 material
+e 5 4 mediation
+e 6 1 Generalization
+e 7 1 Generalization
+e 8 6 Generalization
+e 9 6 Generalization
+e 10 6 Generalization
+e 12 11 Generalization
+e 12 15 Generalization
+e 13 17 Generalization
+e 13 15 material
+e 14 13 None
+e 14 15 None
+e 15 10 Generalization
+e 15 43 Generalization
+e 16 43 Generalization
+e 16 49 material
+e 17 16 Generalization
+e 18 16 Generalization
+e 18 19 material
+e 19 43 Generalization
+e 20 18 mediation
+e 20 19 mediation
+e 21 11 Generalization
+e 21 16 Generalization
+e 22 19 Generalization
+e 23 19 Generalization
+e 24 19 Generalization
+e 25 16 Generalization
+e 26 25 Generalization
+e 27 22 Generalization
+e 27 26 material
+e 28 23 Generalization
+e 28 26 material
+e 29 26 mediation
+e 29 27 mediation
+e 30 26 mediation
+e 30 28 mediation
+e 31 43 Generalization
+e 31 11 mediation
+e 31 24 mediation
+e 32 31 Generalization
+e 33 31 Generalization
+e 34 31 Generalization
+e 35 34 Generalization
+e 35 40 material
+e 36 35 mediation
+e 36 40 mediation
+e 37 25 Generalization
+e 38 19 Generalization
+e 39 38 mediation
+e 39 54 mediation
+e 39 53 mediation
+e 40 19 Generalization
+e 41 14 Generalization
+e 42 14 Generalization
+e 44 19 Generalization
+e 45 19 Generalization
+e 46 55 Generalization
+e 46 31 mediation
+e 46 48 mediation
+e 47 16 Generalization
+e 47 43 material
+e 48 15 Generalization
+e 50 49 Generalization
+e 51 49 Generalization
+e 52 16 mediation
+e 52 49 mediation
+e 53 37 Generalization
+e 54 37 Generalization
+e 55 43 mediation
+e 55 47 mediation
+e 56 16 Generalization
+e 56 19 material
+e 57 19 mediation
+e 57 56 mediation
+e 58 1 Generalization
+e 58 16 material
+e 59 58 Generalization
+e 60 58 Generalization
+e 61 58 Generalization
+e 62 58 Generalization
+e 63 16 mediation
+e 63 58 mediation
+e 64 1 Generalization
+e 64 65 material
+e 65 1 Generalization
+e 66 64 mediation
+e 66 65 mediation
+t # guizzardi2022ufo
+v 1 kind
+v 2 role
+v 3 role
+v 4 role
+v 5 kind
+v 6 subkind
+v 7 subkind
+v 8 quantity
+v 9 role
+v 10 role
+v 11 role
+v 12 relator
+v 13 role
+v 14 kind
+v 15 role
+v 16 collective
+v 17 relator
+v 18 relator
+v 19 kind
+v 20 kind
+v 21 relator
+v 22 relator
+v 23 kind
+v 24 subkind
+v 25 quality
+v 26 subkind
+v 27 enumeration
+v 28 kind
+v 29 kind
+v 30 mode
+v 31 event
+v 32 event
+v 33 event
+v 34 role
+v 35 role
+v 36 event
+v 37 event
+v 38 event
+v 39 event
+v 40 enumeration
+v 41 kind
+v 42 role
+v 43 mode
+v 44 phase
+v 45 phase
+v 46 phase
+v 47 phase
+v 48 mode
+v 49 role
+v 50 role
+v 51 role
+v 52 kind
+v 53 kind
+v 54 subkind
+v 55 subkind
+v 56 role
+v 57 role
+v 58 relator
+v 59 role
+v 60 subkind
+v 61 type
+v 62 type
+e 2 6 Generalization
+e 2 1 componentOf
+e 3 6 Generalization
+e 3 1 componentOf
+e 4 6 Generalization
+e 4 1 componentOf
+e 5 10 formal
+e 6 5 Generalization
+e 7 5 Generalization
+e 9 7 Generalization
+e 9 1 componentOf
+e 10 8 Generalization
+e 11 6 Generalization
+e 11 1 componentOf
+e 12 13 mediation
+e 12 19 mediation
+e 13 14 Generalization
+e 15 14 Generalization
+e 15 16 memberOf
+e 17 15 mediation
+e 17 19 mediation
+e 18 21 mediation
+e 18 17 mediation
+e 21 20 mediation
+e 21 16 mediation
+e 21 19 mediation
+e 22 12 mediation
+e 22 21 mediation
+e 24 23 Generalization
+e 26 25 Generalization
+e 26 23 characterization
+e 26 27 None
+e 30 35 characterization
+e 30 34 externalDependence
+e 30 33 manifestation
+e 31 32 Generalization
+e 31 30 None
+e 31 33 formal
+e 32 32 formal
+e 33 32 Generalization
+e 34 28 Generalization
+e 35 29 Generalization
+e 36 33 Generalization
+e 37 33 Generalization
+e 37 40 None
+e 38 37 Generalization
+e 39 37 Generalization
+e 42 41 Generalization
+e 43 50 externalDependence
+e 43 42 characterization
+e 44 43 Generalization
+e 45 43 Generalization
+e 46 45 Generalization
+e 46 50 formal
+e 47 45 Generalization
+e 47 49 material
+e 48 49 externalDependence
+e 48 47 characterization
+e 49 51 Generalization
+e 50 51 Generalization
+e 51 52 Generalization
+e 54 53 Generalization
+e 55 53 Generalization
+e 56 54 Generalization
+e 56 59 Generalization
+e 57 55 Generalization
+e 57 59 Generalization
+e 58 59 mediation
+e 59 53 Generalization
+e 59 62 instantiation
+e 60 58 Generalization
+e 60 56 mediation
+e 60 57 mediation
+e 61 58 instantiation
+e 62 61 formal
+t # fraller2019abc
+v 1 kind
+v 2 kind
+v 3 kind
+v 4 subkind
+v 5 subkind
+v 6 relator
+v 7 subkind
+v 8 subkind
+v 9 relator
+v 10 phase
+v 11 phase
+v 12 phase
+v 13 phase
+v 14 subkind
+v 15 subkind
+v 16 subkind
+v 17 relator
+v 18 subkind
+v 19 subkind
+v 20 subkind
+v 21 subkind
+v 22 relator
+v 23 kind
+v 24 subkind
+v 25 subkind
+v 26 subkind
+v 27 subkind
+v 28 subkind
+v 29 subkind
+v 30 relator
+v 31 kind
+v 32 relator
+v 33 kind
+v 34 kind
+v 35 kind
+v 36 kind
+v 37 kind
+v 38 subkind
+v 39 subkind
+e 1 4 formal
+e 1 7 formal
+e 1 8 formal
+e 2 3 None
+e 2 23 formal
+e 4 2 Generalization
+e 4 6 mediation
+e 4 5 material
+e 5 2 Generalization
+e 5 6 mediation
+e 5 1 formal
+e 7 2 Generalization
+e 7 8 material
+e 8 2 Generalization
+e 9 7 mediation
+e 9 8 mediation
+e 10 1 Generalization
+e 11 1 Generalization
+e 12 1 Generalization
+e 13 1 Generalization
+e 14 1 Generalization
+e 15 1 Generalization
+e 16 1 Generalization
+e 17 18 mediation
+e 17 19 mediation
+e 18 14 Generalization
+e 18 18 formal
+e 19 14 Generalization
+e 19 18 material
+e 19 33 None
+e 20 15 Generalization
+e 20 21 material
+e 21 15 Generalization
+e 22 20 mediation
+e 22 21 mediation
+e 24 23 Generalization
+e 25 23 Generalization
+e 26 23 Generalization
+e 27 23 Generalization
+e 28 23 Generalization
+e 28 36 None
+e 29 14 Generalization
+e 30 19 mediation
+e 30 31 mediation
+e 31 1 material
+e 31 19 material
+e 32 1 mediation
+e 32 31 mediation
+e 33 19 formal
+e 34 31 None
+e 35 34 formal
+e 35 33 formal
+e 35 36 formal
+e 35 37 formal
+e 36 28 formal
+e 38 37 Generalization
+e 38 31 formal
+e 39 37 Generalization
+e 39 31 formal
+t # garcia2022human-genome-events
+v 1 category
+v 2 historicalRoleMixin
+v 3 historicalRoleMixin
+v 4 historicalRoleMixin
+v 5 historicalRoleMixin
+v 6 event
+v 7 event
+v 8 event
+v 9 phaseMixin
+v 10 phaseMixin
+v 11 event
+v 12 event
+v 13 type
+v 14 datatype
+v 15 datatype
+e 2 1 Generalization
+e 2 12 participation
+e 2 13 instantiation
+e 3 2 Generalization
+e 4 2 Generalization
+e 5 2 Generalization
+e 6 7 Generalization
+e 7 11 Generalization
+e 7 7 historicalDependence
+e 8 7 None
+e 9 1 Generalization
+e 9 6 termination
+e 10 1 Generalization
+e 10 6 creation
+e 12 11 Generalization
+e 12 6 participational
+e 12 13 externalDependence
+t # alpinebits2022
+v 1 datatype
+v 2 datatype
+v 3 datatype
+v 4 datatype
+v 5 relator
+v 6 phase
+v 7 category
+v 8 roleMixin
+v 9 kind
+v 10 kind
+v 11 roleMixin
+v 12 subkind
+v 13 subkind
+v 14 roleMixin
+v 15 roleMixin
+v 16 category
+v 17 kind
+v 18 kind
+v 19 category
+v 20 subkind
+v 21 roleMixin
+v 22 quality
+v 23 subkind
+v 24 subkind
+v 25 subkind
+v 26 category
+v 27 subkind
+v 28 datatype
+v 29 datatype
+v 30 kind
+v 31 kind
+v 32 category
+v 33 subkind
+v 34 kind
+v 35 subkind
+v 36 subkind
+v 37 subkind
+v 38 enumeration
+v 39 enumeration
+v 40 datatype
+v 41 relator
+v 42 type
+v 43 phaseMixin
+v 44 phaseMixin
+v 45 phaseMixin
+v 46 enumeration
+v 47 roleMixin
+v 48 subkind
+v 49 subkind
+v 50 subkind
+v 51 kind
+v 52 type
+v 53 roleMixin
+v 54 subkind
+v 55 datatype
+v 56 datatype
+v 57 datatype
+v 58 datatype
+v 59 datatype
+v 60 subkind
+v 61 subkind
+v 62 subkind
+v 63 enumeration
+v 64 datatype
+v 65 phase
+v 66 subkind
+v 67 quality
+v 68 type
+v 69 type
+v 70 roleMixin
+v 71 subkind
+v 72 subkind
+v 73 subkind
+v 74 phase
+v 75 phase
+v 76 phase
+v 77 kind
+v 78 collective
+e 5 32 Generalization
+e 5 8 mediation
+e 5 11 material
+e 5 14 material
+e 5 15 material
+e 5 21 material
+e 5 27 instantiation
+e 5 20 instantiation
+e 5 77 material
+e 5 78 mediation
+e 6 5 Generalization
+e 7 32 Generalization
+e 8 7 Generalization
+e 9 7 Generalization
+e 10 7 Generalization
+e 11 7 Generalization
+e 12 5 None
+e 13 5 Generalization
+e 14 7 Generalization
+e 15 7 Generalization
+e 17 19 Generalization
+e 18 19 Generalization
+e 19 32 historicalDependence
+e 19 54 instantiation
+e 19 52 material
+e 19 53 material
+e 19 70 material
+e 20 68 Generalization
+e 21 26 Generalization
+e 22 16 characterization
+e 23 22 Generalization
+e 24 22 Generalization
+e 25 22 Generalization
+e 26 16 Generalization
+e 26 32 Generalization
+e 26 26 material
+e 27 20 Generalization
+e 27 32 Generalization
+e 27 73 instantiation
+e 30 26 Generalization
+e 30 32 Generalization
+e 30 34 componentOf
+e 30 35 instantiation
+e 31 26 Generalization
+e 31 34 componentOf
+e 31 36 instantiation
+e 32 68 instantiation
+e 32 69 material
+e 33 31 Generalization
+e 33 32 Generalization
+e 33 37 material
+e 33 72 instantiation
+e 34 26 Generalization
+e 34 32 Generalization
+e 34 47 material
+e 34 66 instantiation
+e 34 48 componentOf
+e 35 68 Generalization
+e 36 68 Generalization
+e 37 69 Generalization
+e 41 16 Generalization
+e 41 7 mediation
+e 41 26 mediation
+e 41 42 mediation
+e 43 26 Generalization
+e 44 26 Generalization
+e 45 26 Generalization
+e 47 7 Generalization
+e 48 34 Generalization
+e 49 34 Generalization
+e 50 31 Generalization
+e 50 32 Generalization
+e 50 71 instantiation
+e 51 19 Generalization
+e 53 7 Generalization
+e 54 68 Generalization
+e 60 22 Generalization
+e 61 22 Generalization
+e 62 22 Generalization
+e 65 5 Generalization
+e 66 68 Generalization
+e 67 31 characterization
+e 68 32 Generalization
+e 68 68 None
+e 69 32 Generalization
+e 69 69 None
+e 70 7 Generalization
+e 71 68 Generalization
+e 72 68 Generalization
+e 73 68 Generalization
+e 74 5 Generalization
+e 75 5 Generalization
+e 76 5 Generalization
+t # aires2022valuenetworks-geo
+v 1 stringNominalStructure
+v 2 kind
+v 3 category
+v 4 relator
+v 5 kind
+v 6 nonPerceivableQuality
+v 7 category
+v 8 kind
+v 9 subkind
+v 10 subkind
+v 11 kind
+v 12 kind
+v 13 category
+v 14 relator
+v 15 kind
+v 16 relator
+v 17 relator
+v 18 kind
+v 19 kind
+v 20 relator
+v 21 relator
+v 22 kind
+e 1 2 None
+e 2 3 Generalization
+e 2 11 material
+e 2 19 material
+e 3 7 None
+e 3 22 None
+e 4 5 mediation
+e 4 2 mediation
+e 5 2 material
+e 6 1 structuration
+e 6 2 None
+e 6 8 characterization
+e 7 13 None
+e 7 22 None
+e 8 13 Generalization
+e 8 5 componentOf
+e 9 8 Generalization
+e 10 8 Generalization
+e 11 13 Generalization
+e 11 10 None
+e 11 5 componentOf
+e 11 8 None
+e 11 21 None
+e 12 13 Generalization
+e 12 9 None
+e 12 10 None
+e 12 11 componentOf
+e 12 8 None
+e 12 16 None
+e 13 22 None
+e 14 7 Generalization
+e 14 12 None
+e 14 11 None
+e 14 15 None
+e 15 3 Generalization
+e 15 12 material
+e 15 11 material
+e 15 19 material
+e 15 17 None
+e 16 7 Generalization
+e 16 18 None
+e 16 15 None
+e 16 17 None
+e 17 7 Generalization
+e 17 18 None
+e 18 3 Generalization
+e 18 12 material
+e 18 19 material
+e 19 13 Generalization
+e 19 17 None
+e 19 20 None
+e 20 7 Generalization
+e 20 15 None
+e 20 2 None
+e 21 7 Generalization
+e 21 20 None
+e 21 15 None
+e 21 2 None
+t # experiment2013
+v 1 mode
+v 2 mode
+v 3 mode
+v 4 mode
+v 5 kind
+v 6 kind
+v 7 kind
+v 8 kind
+v 9 kind
+v 10 kind
+v 11 kind
+v 12 kind
+v 13 kind
+v 14 kind
+v 15 kind
+v 16 kind
+v 17 kind
+v 18 kind
+v 19 datatype
+v 20 datatype
+v 21 kind
+v 22 collective
+e 1 2 characterization
+e 1 3 Formal
+e 1 4 Formal
+e 4 5 Formal
+e 4 6 Formal
+e 5 7 Formal
+e 5 11 Formal
+e 6 7 Formal
+e 7 8 componentOf
+e 8 9 componentOf
+e 8 16 componentOf
+e 8 17 componentOf
+e 8 18 componentOf
+e 10 9 componentOf
+e 11 7 componentOf
+e 11 8 componentOf
+e 11 10 componentOf
+e 12 13 Formal
+e 12 14 Formal
+e 12 15 Formal
+e 13 10 componentOf
+e 14 9 componentOf
+e 18 19 Formal
+e 18 20 Formal
+e 18 22 memberOf
+e 18 21 componentOf
+t # fonseca2022incorporating
+v 1 category
+v 2 category
+v 3 roleMixin
+v 4 roleMixin
+v 5 role
+v 6 role
+v 7 roleMixin
+v 8 type
+v 9 kind
+v 10 kind
+v 11 kind
+v 12 kind
+v 13 kind
+v 14 role
+v 15 roleMixin
+v 16 phaseMixin
+v 17 phaseMixin
+v 18 relator
+v 19 relator
+v 20 relator
+v 21 type
+v 22 kind
+v 23 subkind
+v 24 subkind
+v 25 subkind
+v 26 kind
+v 27 role
+v 28 mode
+v 29 phase
+v 30 phase
+v 31 phase
+v 32 phase
+v 33 phase
+v 34 relator
+v 35 kind
+v 36 relator
+v 37 role
+v 38 quality
+v 39 phase
+v 40 phase
+v 41 type
+v 42 phase
+v 43 phase
+v 44 phase
+v 45 role
+v 46 kind
+v 47 subkind
+v 48 subkind
+v 49 kind
+v 50 role
+v 51 relator
+e 3 2 Generalization
+e 4 2 Generalization
+e 5 11 Generalization
+e 5 4 Generalization
+e 6 11 Generalization
+e 6 4 Generalization
+e 7 2 Generalization
+e 8 1 Generalization
+e 9 1 Generalization
+e 10 8 instantiation
+e 11 2 Generalization
+e 12 2 Generalization
+e 13 1 Generalization
+e 14 11 Generalization
+e 14 4 Generalization
+e 15 1 Generalization
+e 16 1 Generalization
+e 17 1 Generalization
+e 18 1 mediation
+e 18 3 mediation
+e 19 7 mediation
+e 19 8 mediation
+e 20 5 mediation
+e 20 8 mediation
+e 22 21 instantiation
+e 22 24 instantiation
+e 23 22 Generalization
+e 24 21 Generalization
+e 25 22 Generalization
+e 27 26 Generalization
+e 28 27 characterization
+e 28 37 externalDependence
+e 29 22 Generalization
+e 30 22 Generalization
+e 31 22 Generalization
+e 32 21 Generalization
+e 33 21 Generalization
+e 34 27 mediation
+e 34 22 mediation
+e 36 24 mediation
+e 36 35 mediation
+e 37 21 Generalization
+e 38 22 characterization
+e 38 24 characterization
+e 39 34 Generalization
+e 40 34 Generalization
+e 42 41 Generalization
+e 43 41 Generalization
+e 44 41 Generalization
+e 45 41 Generalization
+e 46 41 instantiation
+e 47 46 Generalization
+e 48 46 Generalization
+e 50 49 Generalization
+e 51 45 mediation
+e 51 50 mediation
+t # andersson2018value-ascription
+v 1 category
+v 2 event
+v 3 event
+v 4 event
+v 5 quale
+v 6 abstract individual
+v 7 set
+v 8 set
+v 9 quality structure
+v 10 endurant
+v 11 situation
+v 12 quality dimension
+v 13 situation
+e 2 1 None
+e 2 5 None
+e 2 2 None
+e 2 6 None
+e 3 2 Generalization
+e 3 4 None
+e 3 13 None
+e 4 2 Generalization
+e 4 10 None
+e 5 9 memberOf
+e 6 7 None
+e 6 8 None
+e 6 9 None
+e 7 10 memberOf
+e 8 11 memberOf
+e 9 12 None
+e 13 11 None
+e 13 10 None
+t # ahmad2018aviation
+v 1 None
+v 2 None
+v 3 None
+v 4 None
+v 5 None
+v 6 None
+v 7 None
+v 8 None
+v 9 None
+v 10 None
+v 11 None
+v 12 None
+v 13 None
+v 14 None
+v 15 None
+v 16 None
+v 17 None
+v 18 None
+v 19 None
+v 20 None
+v 21 None
+e 1 19 Generalization
+e 2 19 Generalization
+e 3 20 Generalization
+e 3 21 None
+e 4 20 Generalization
+e 5 18 Generalization
+e 6 18 Generalization
+e 7 6 Generalization
+e 8 6 Generalization
+e 8 18 Generalization
+e 9 12 Generalization
+e 9 8 Generalization
+e 9 13 None
+e 10 8 Generalization
+e 10 18 None
+e 11 8 Generalization
+e 12 7 Generalization
+e 13 12 Generalization
+e 14 15 Generalization
+e 14 21 Generalization
+e 16 10 None
+e 17 6 None
+e 18 18 None
+e 18 19 None
+e 19 21 None
+e 20 19 Generalization
+e 20 21 None
+e 20 15 None
+e 21 18 Generalization
+t # elikan2018brand-identity
+v 1 category
+v 2 kind
+v 3 relator
+v 4 kind
+v 5 kind
+v 6 kind
+v 7 kind
+v 8 category
+v 9 kind
+v 10 mode
+v 11 mode
+v 12 mode
+v 13 kind
+v 14 mode
+v 15 mode
+v 16 mode
+v 17 kind
+v 18 category
+v 19 mode
+v 20 mode
+v 21 collective
+v 22 collective
+v 23 collective
+v 24 collective
+v 25 collective
+v 26 kind
+v 27 kind
+v 28 collective
+v 29 subkind
+v 30 subkind
+e 1 3 formal
+e 2 1 Generalization
+e 2 8 None
+e 3 4 formal
+e 3 5 formal
+e 3 6 formal
+e 3 7 formal
+e 3 8 mediation
+e 3 21 mediation
+e 9 8 Generalization
+e 9 23 material
+e 10 9 characterization
+e 11 9 characterization
+e 12 9 characterization
+e 13 8 Generalization
+e 13 24 material
+e 14 13 characterization
+e 15 13 characterization
+e 16 13 characterization
+e 17 8 Generalization
+e 17 18 Generalization
+e 17 22 material
+e 19 17 characterization
+e 20 17 characterization
+e 21 27 None
+e 22 21 memberOf
+e 23 21 memberOf
+e 24 21 memberOf
+e 25 22 memberOf
+e 26 25 None
+e 27 18 Generalization
+e 27 30 None
+e 27 29 None
+e 27 26 None
+e 28 24 memberOf
+e 30 29 None
+t # albuquerque2011ontobio
+v 1 kind
+v 2 role
+v 3 role
+v 4 role
+v 5 role
+v 6 role
+v 7 role
+v 8 category
+v 9 role
+v 10 relator
+v 11 type
+v 12 role
+v 13 role
+v 14 role
+v 15 category
+v 16 relator
+v 17 relator
+v 18 kind
+v 19 role
+v 20 relator
+v 21 relator
+v 22 relator
+v 23 relator
+v 24 role
+v 25 kind
+v 26 relator
+v 27 relator
+v 28 relator
+v 29 kind
+v 30 type
+v 31 category
+v 32 subkind
+v 33 subkind
+v 34 subkind
+v 35 subkind
+v 36 type
+v 37 subkind
+v 38 subkind
+v 39 subkind
+v 40 subkind
+v 41 subkind
+v 42 subkind
+v 43 mode
+v 44 mode
+v 45 mode
+v 46 mode
+v 47 mode
+v 48 mode
+v 49 mode
+v 50 mode
+v 51 mode
+v 52 mode
+v 53 mode
+v 54 mode
+v 55 mode
+v 56 mode
+v 57 mode
+v 58 mode
+v 59 category
+v 60 type
+v 61 type
+v 62 type
+v 63 category
+v 64 category
+v 65 collective
+v 66 category
+v 67 collective
+v 68 collective
+v 69 kind
+v 70 category
+v 71 subkind
+v 72 subkind
+v 73 subkind
+v 74 subkind
+v 75 subkind
+v 76 subkind
+v 77 category
+v 78 category
+v 79 category
+v 80 category
+v 81 category
+v 82 category
+v 83 category
+v 84 category
+v 85 mixin
+v 86 mixin
+v 87 mixin
+v 88 mixin
+v 89 mixin
+v 90 mixin
+v 91 mixin
+v 92 mixin
+v 93 quantity
+v 94 quantity
+v 95 quantity
+v 96 subkind
+v 97 subkind
+v 98 subkind
+v 99 subkind
+v 100 subkind
+v 101 subkind
+v 102 subkind
+v 103 subkind
+v 104 subkind
+v 105 subkind
+v 106 subkind
+v 107 subkind
+v 108 category
+v 109 datatype
+v 110 type
+v 111 category
+v 112 category
+v 113 category
+v 114 type
+v 115 type
+v 116 category
+v 117 category
+v 118 category
+v 119 category
+v 120 category
+v 121 category
+v 122 kind
+v 123 kind
+v 124 kind
+v 125 kind
+v 126 subkind
+v 127 subkind
+v 128 subkind
+v 129 subkind
+v 130 subkind
+v 131 subkind
+v 132 subkind
+v 133 subkind
+v 134 subkind
+v 135 subkind
+v 136 subkind
+v 137 subkind
+v 138 subkind
+v 139 category
+v 140 category
+v 141 category
+v 142 category
+v 143 category
+v 144 category
+v 145 category
+v 146 category
+v 147 category
+e 1 66 Generalization
+e 2 1 Generalization
+e 2 10 mediation
+e 3 1 Generalization
+e 3 16 mediation
+e 4 1 Generalization
+e 4 17 mediation
+e 4 18 material
+e 5 3 Generalization
+e 6 3 Generalization
+e 6 4 Generalization
+e 7 6 Generalization
+e 8 109 None
+e 9 8 Generalization
+e 9 16 mediation
+e 10 11 mediation
+e 10 12 mediation
+e 11 60 Generalization
+e 11 11 comparative
+e 12 14 Generalization
+e 13 14 Generalization
+e 14 15 Generalization
+e 15 59 Generalization
+e 15 29 componentOf
+e 15 60 None
+e 15 85 comparative
+e 16 7 mediation
+e 16 13 mediation
+e 17 18 mediation
+e 19 18 Generalization
+e 19 16 mediation
+e 20 16 Generalization
+e 21 16 Generalization
+e 22 16 Generalization
+e 23 16 Generalization
+e 24 25 Generalization
+e 24 23 mediation
+e 26 24 Generalization
+e 27 24 Generalization
+e 28 24 Generalization
+e 29 59 Generalization
+e 29 29 componentOf
+e 29 30 comparative
+e 29 8 comparative
+e 31 59 Generalization
+e 31 29 componentOf
+e 32 29 Generalization
+e 32 33 componentOf
+e 33 29 Generalization
+e 34 29 Generalization
+e 34 32 componentOf
+e 35 33 Generalization
+e 35 36 comparative
+e 37 35 Generalization
+e 38 35 Generalization
+e 38 69 Generalization
+e 39 35 Generalization
+e 39 69 Generalization
+e 40 35 Generalization
+e 41 35 Generalization
+e 42 35 Generalization
+e 45 43 Generalization
+e 46 43 Generalization
+e 47 43 Generalization
+e 48 44 Generalization
+e 49 44 Generalization
+e 50 44 Generalization
+e 51 44 Generalization
+e 52 43 characterization
+e 52 53 characterization
+e 52 44 characterization
+e 54 53 Generalization
+e 55 53 Generalization
+e 56 53 Generalization
+e 57 52 Generalization
+e 58 52 Generalization
+e 61 60 Generalization
+e 62 60 Generalization
+e 62 61 comparative
+e 62 11 comparative
+e 63 15 Generalization
+e 63 68 memberOf
+e 64 15 Generalization
+e 64 67 memberOf
+e 66 15 Generalization
+e 66 65 memberOf
+e 68 69 comparative
+e 69 70 None
+e 70 8 Generalization
+e 70 109 None
+e 71 69 Generalization
+e 72 69 Generalization
+e 73 69 Generalization
+e 74 69 Generalization
+e 75 69 Generalization
+e 76 69 Generalization
+e 77 15 comparative
+e 78 77 Generalization
+e 79 77 Generalization
+e 80 77 Generalization
+e 81 77 Generalization
+e 82 77 Generalization
+e 83 77 Generalization
+e 84 77 Generalization
+e 86 85 Generalization
+e 87 85 Generalization
+e 88 85 Generalization
+e 89 85 Generalization
+e 90 85 Generalization
+e 91 85 Generalization
+e 92 85 Generalization
+e 93 31 Generalization
+e 94 31 Generalization
+e 95 31 Generalization
+e 96 95 Generalization
+e 97 95 Generalization
+e 98 95 Generalization
+e 99 97 Generalization
+e 100 97 Generalization
+e 101 97 Generalization
+e 102 93 Generalization
+e 103 93 Generalization
+e 104 93 Generalization
+e 105 93 Generalization
+e 106 93 Generalization
+e 107 93 Generalization
+e 108 8 Generalization
+e 108 109 None
+e 111 70 Generalization
+e 111 110 comparative
+e 112 70 Generalization
+e 112 114 comparative
+e 113 70 Generalization
+e 113 115 comparative
+e 116 111 Generalization
+e 117 111 Generalization
+e 118 111 Generalization
+e 119 111 Generalization
+e 120 111 Generalization
+e 121 111 Generalization
+e 122 112 Generalization
+e 123 112 Generalization
+e 123 122 comparative
+e 124 112 Generalization
+e 124 123 comparative
+e 125 112 Generalization
+e 125 124 comparative
+e 126 125 Generalization
+e 127 125 Generalization
+e 128 125 Generalization
+e 129 125 Generalization
+e 130 125 Generalization
+e 131 125 Generalization
+e 132 125 Generalization
+e 133 127 Generalization
+e 134 127 Generalization
+e 135 127 Generalization
+e 136 127 Generalization
+e 137 133 Generalization
+e 138 133 Generalization
+e 139 113 Generalization
+e 140 113 Generalization
+e 141 113 Generalization
+e 142 113 Generalization
+e 143 113 Generalization
+e 144 113 Generalization
+e 145 113 Generalization
+e 146 113 Generalization
+e 147 113 Generalization
