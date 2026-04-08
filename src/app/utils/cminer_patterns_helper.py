@@ -32,13 +32,13 @@ def parse_cminer_output(text: str) -> list[PatternInfo]:
             if m:
                 pat_id = int(m.group(1))
                 continue
-            m = re.match(r'v\s+(\d+)\s+(\S+)', line)
+            m = re.match(r'v\s+(\d+)(?:\s+(\S+))?', line)
             if m:
-                nodes.append((int(m.group(1)), m.group(2)))
+                nodes.append((int(m.group(1)), m.group(2) or ""))
                 continue
-            m = re.match(r'e\s+(\d+)\s+(\d+)\s+(\S+)', line)
+            m = re.match(r'e\s+(\d+)\s+(\d+)(?:\s+(\S+))?', line)
             if m:
-                edges.append((int(m.group(1)), int(m.group(2)), m.group(3)))
+                edges.append((int(m.group(1)), int(m.group(2)), m.group(3) or ""))
                 continue
             m = re.match(r's\s+([\d.]+)', line)
             if m:
