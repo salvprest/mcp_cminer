@@ -645,8 +645,8 @@ class Pipe:
         MODEL: str = Field(default="chatgpt-4o", description="Model to use")
         DISPLAY_NAME: str = Field(default="Conceptual Model Assistant", description="Display name")
         TEMPERATURE: float = Field(default=0.3)
-        MAX_TOKENS: int = Field(default=8192)
-        MAX_ITERATIONS: int = Field(default=10)
+        MAX_TOKENS: int = Field(default=12192)
+        MAX_ITERATIONS: int = Field(default=30)
 
         # ── Context window management ────────────────────────────────────
         MAX_HISTORY_MESSAGES: int = Field(
@@ -707,9 +707,9 @@ class Pipe:
                 You can:
                 - Load & Analyze Models: load an uploaded model file, summarize it's content, and explain its domain semantics based on its metamodel.
                 - Filter & Focus: filter loaded models to focus on specific parts, list available filters, reset to the original graph.
-                - Mine Graph Patterns: run CMiner to discover frequent subgraphs. Dynamically adjust parameters like `min_support`, `min_nodes`, and `max_nodes` to refine the search.
+                - Mine Graphs Patterns: run CMiner to discover frequent subgraphs or patterns in the loaded models. Dynamically adjust parameters like `min_support`, `min_nodes`, and `max_nodes` to refine the search.
                 - Query & Explore: filter mined patterns by criteria. get stats on specific pattern IDs, generate a full session summary.
-                - Visualize: build an interactive HTML for the model graph and discovered patterns.
+                - Visualize: build an interactive HTML for the loaded models graph and/or the discovered patterns.
                 
                 Rules:
                 - ALWAYS execute the tools needed to answer the user's query.

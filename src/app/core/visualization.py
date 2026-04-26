@@ -7,15 +7,16 @@ def generate_html_visualization(
     patterns: list[PatternInfo],
     patterns_plantuml: list[str],
     plantuml_server: str = PLANTUML_SERVER,
-    model_plantuml: str | None = None,
+    models_plantuml: dict[str, str] | None = None,
 ) -> str:
+    if models_plantuml is None:
+        models_plantuml = {}
+
+    # ── Pattern sidebar items ──
     sidebar_items: list[str] = []
     img_urls:      list[str] = []
 
     for idx, p in enumerate(patterns):
-        if idx == 300:
-            print("print onl the 300 pattern")
-            print(f"{patterns_plantuml[idx]}")
         encoded = plantuml_encode(patterns_plantuml[idx])
         img_urls.append(f"{plantuml_server}/svg/{encoded}")
         sidebar_items.append(
@@ -36,15 +37,33 @@ def generate_html_visualization(
     )
     count = len(patterns)
 
-    model_tab_btn = ""
-    model_img_url = "null"
-    if model_plantuml:
-        encoded_model = plantuml_encode(model_plantuml)
-        model_img_url = json.dumps(f"{plantuml_server}/svg/{encoded_model}")
-        model_tab_btn = '<button class="tab-btn" id="tab-model" onclick="switchTab(\'model\')">Model Graph</button>'
+    # ── Model list sidebar items + URLs ──
+    model_names: list[str] = []
+    model_urls:  list[str] = []
+    model_sidebar_items: list[str] = []
 
-    has_model    = "true" if model_plantuml else "false"
+    for idx, (name, puml) in enumerate(models_plantuml.items()):
+        encoded = plantuml_encode(puml)
+        model_urls.append(f"{plantuml_server}/svg/{encoded}")
+        model_names.append(name)
+        model_sidebar_items.append(
+            f'<div class="pat-item" id="mi-{idx}" onclick="showModel({idx})">'
+            f'<div class="pat-title">{name}</div>'
+            f'</div>'
+        )
+
+    model_sidebar_html = "\n".join(model_sidebar_items)
+    model_urls_json  = json.dumps(model_urls, ensure_ascii=False)
+    model_names_json = json.dumps(model_names, ensure_ascii=False)
+    model_count = len(models_plantuml)
+
+    has_models   = "true" if models_plantuml else "false"
     has_patterns = "true" if patterns       else "false"
+
+    # Build tab buttons
+    models_tab_btn = ""
+    if models_plantuml:
+        models_tab_btn = '<button class="tab-btn" id="tab-models" onclick="switchTab(\'models\')">Models</button>'
 
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -69,7 +88,7 @@ def generate_html_visualization(
       padding: 14px 16px; background: #1a252f;
       font-size: .95em; letter-spacing: .05em;
     }}
-    #pattern-list {{ flex: 1; overflow-y: auto; }}
+    .sidebar-list {{ flex: 1; overflow-y: auto; }}
     .pat-item {{
       padding: 11px 16px; cursor: pointer;
       border-bottom: 1px solid #3d5166;
@@ -102,25 +121,22 @@ def generate_html_visualization(
       min-height: 38px; flex-shrink: 0;
     }}
 
-    /* ── Viewport: the clipping window ── */
+    /* ── Viewport ── */
     .viewport {{
       flex: 1; position: relative; overflow: hidden;
       background: #fff; margin: 14px; border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,.12);
       cursor: grab;
-      /* prevent browser text/image selection while dragging */
       user-select: none; -webkit-user-select: none;
     }}
     .viewport:active {{ cursor: grabbing; }}
 
-    /* ── Canvas: the layer we pan & zoom ── */
     .canvas {{
       position: absolute;
       top: 0; left: 0;
       transform-origin: 0 0;
     }}
 
-    /* ── Image inside canvas ── */
     .canvas img {{
       display: block;
       draggable: false;
@@ -129,7 +145,6 @@ def generate_html_visualization(
       pointer-events: none;
     }}
 
-    /* ── Overlay controls / messages ── */
     .zoom-controls {{
       position: absolute; top: 10px; right: 14px;
       display: flex; flex-direction: column; gap: 4px; z-index: 10;
@@ -154,7 +169,6 @@ def generate_html_visualization(
       color: #bbb; font-size: 1.1em; pointer-events: none; z-index: 5;
     }}
 
-    /* ── Panels ── */
     .panel {{ display: none; flex-direction: column; flex: 1; overflow: hidden; min-height: 0; }}
     .panel.active {{ display: flex; }}
   </style>
@@ -163,15 +177,18 @@ def generate_html_visualization(
 
   <!-- Sidebar -->
   <div id="sidebar">
-    <h2>&#9741; {count} Pattern{'s' if count != 1 else ''} found</h2>
-    <div id="pattern-list">{sidebar_html}</div>
+    <h2 id="sidebar-title">&#9741; {count} Pattern{'s' if count != 1 else ''} found</h2>
+    <!-- Pattern list (shown when patterns tab active) -->
+    <div class="sidebar-list" id="pattern-list">{sidebar_html}</div>
+    <!-- Model list (shown when models tab active) -->
+    <div class="sidebar-list" id="model-list" style="display:none">{model_sidebar_html}</div>
   </div>
 
   <!-- Main -->
   <div id="main">
     <div id="tab-bar">
       <button class="tab-btn" id="tab-patterns" onclick="switchTab('patterns')">Patterns</button>
-      {model_tab_btn}
+      {models_tab_btn}
     </div>
 
     <!-- Patterns panel -->
@@ -184,42 +201,44 @@ def generate_html_visualization(
         <div class="status-msg" id="status-patterns">No pattern selected</div>
         <div class="zoom-controls">
           <button class="zoom-btn" onclick="zoomStep('patterns',1.25)" title="Zoom in">+</button>
-          <button class="zoom-btn" onclick="zoomStep('patterns',0.8)"  title="Zoom out">−</button>
-          <button class="zoom-btn" onclick="resetZoom('patterns')"     title="Fit to window">⤢</button>
+          <button class="zoom-btn" onclick="zoomStep('patterns',0.8)"  title="Zoom out">\u2212</button>
+          <button class="zoom-btn" onclick="resetZoom('patterns')"     title="Fit to window">\u2922</button>
         </div>
-        <div class="zoom-hint">scroll / pinch · drag to pan</div>
+        <div class="zoom-hint">scroll / pinch \u00b7 drag to pan</div>
       </div>
     </div>
 
-    <!-- Model panel -->
-    <div id="panel-model" class="panel">
-      <div class="viewport" id="vp-model">
-        <div class="canvas" id="canvas-model">
+    <!-- Models panel -->
+    <div id="panel-models" class="panel">
+      <div id="model-info-bar">Select a model from the left panel.</div>
+      <div class="viewport" id="vp-models">
+        <div class="canvas" id="canvas-models">
           <img id="model-img" src="" alt="Model graph" draggable="false"/>
         </div>
-        <div class="status-msg" id="status-model">Loading model…</div>
+        <div class="status-msg" id="status-models">No model selected</div>
         <div class="zoom-controls">
-          <button class="zoom-btn" onclick="zoomStep('model',1.25)" title="Zoom in">+</button>
-          <button class="zoom-btn" onclick="zoomStep('model',0.8)"  title="Zoom out">−</button>
-          <button class="zoom-btn" onclick="resetZoom('model')"     title="Fit to window">⤢</button>
+          <button class="zoom-btn" onclick="zoomStep('models',1.25)" title="Zoom in">+</button>
+          <button class="zoom-btn" onclick="zoomStep('models',0.8)"  title="Zoom out">\u2212</button>
+          <button class="zoom-btn" onclick="resetZoom('models')"     title="Fit to window">\u2922</button>
         </div>
-        <div class="zoom-hint">scroll / pinch · drag to pan</div>
+        <div class="zoom-hint">scroll / pinch \u00b7 drag to pan</div>
       </div>
     </div>
   </div>
 
 <script>
 /* ── Data ── */
-const URLS      = {urls_json};
-const METAS     = {metas_json};
-const MODEL_URL = {model_img_url};
-const HAS_MODEL = {has_model};
-const HAS_PATS  = {has_patterns};
+const URLS        = {urls_json};
+const METAS       = {metas_json};
+const MODEL_URLS  = {model_urls_json};
+const MODEL_NAMES = {model_names_json};
+const HAS_MODELS  = {has_models};
+const HAS_PATS    = {has_patterns};
 
 /* ── Per-panel state ── */
 const state = {{
   patterns: {{ scale: 1, ox: 0, oy: 0, imgW: 0, imgH: 0 }},
-  model:    {{ scale: 1, ox: 0, oy: 0, imgW: 0, imgH: 0 }},
+  models:   {{ scale: 1, ox: 0, oy: 0, imgW: 0, imgH: 0 }},
 }};
 
 function els(panel) {{
@@ -231,7 +250,6 @@ function els(panel) {{
   }};
 }}
 
-/* Push current state → CSS transform */
 function applyTransform(panel) {{
   const s = state[panel];
   els(panel).canvas.style.transform =
@@ -242,17 +260,14 @@ function fitToViewport(panel) {{
   const s  = state[panel];
   const e  = els(panel);
   if (!s.imgW || !s.imgH) return;
-
   const vpW = e.vp.clientWidth;
   const vpH = e.vp.clientHeight;
-
   const PADDING = 32;
   const fit = Math.min(
     (vpW - PADDING) / s.imgW,
     (vpH - PADDING) / s.imgH,
     1
   );
-
   s.scale = fit;
   s.ox    = (vpW - s.imgW * fit) / 2;
   s.oy    = (vpH - s.imgH * fit) / 2;
@@ -261,12 +276,10 @@ function fitToViewport(panel) {{
 
 function resetZoom(panel) {{ fitToViewport(panel); }}
 
-/* Zoom towards an arbitrary focal point (viewport-relative px) */
 function zoomAt(panel, factor, focalX, focalY) {{
   const s        = state[panel];
   const newScale = Math.min(Math.max(s.scale * factor, 0.05), 50);
   const ratio    = newScale / s.scale;
-
   s.ox    = focalX - ratio * (focalX - s.ox);
   s.oy    = focalY - ratio * (focalY - s.oy);
   s.scale = newScale;
@@ -278,37 +291,31 @@ function zoomStep(panel, factor) {{
   zoomAt(panel, factor, e.vp.clientWidth / 2, e.vp.clientHeight / 2);
 }}
 
-/* Load image into a panel, then auto-fit */
 function loadImage(panel, url) {{
   const e = els(panel);
-  e.img.style.display  = 'none';
+  e.img.style.display    = 'none';
   e.status.style.display = 'flex';
   e.status.textContent   = 'Loading\u2026';
 
   e.img.onload = () => {{
     const s = state[panel];
-
     let w = e.img.naturalWidth;
     let h = e.img.naturalHeight;
     if (!w || !h) {{
-      e.img.style.display  = 'block';
-      e.img.style.position = 'absolute';
+      e.img.style.display    = 'block';
+      e.img.style.position   = 'absolute';
       e.img.style.visibility = 'hidden';
       w = e.img.offsetWidth  || 800;
       h = e.img.offsetHeight || 600;
       e.img.style.visibility = '';
       e.img.style.position   = '';
     }}
-
-    s.imgW = w;
-    s.imgH = h;
-
+    s.imgW = w; s.imgH = h;
     e.canvas.style.width  = w + 'px';
     e.canvas.style.height = h + 'px';
     e.img.style.width     = w + 'px';
     e.img.style.height    = h + 'px';
     e.img.style.display   = 'block';
-
     e.status.style.display = 'none';
     fitToViewport(panel);
   }};
@@ -326,8 +333,25 @@ function switchTab(name) {{
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('panel-' + name).classList.add('active');
   document.getElementById('tab-'   + name).classList.add('active');
-  document.getElementById('sidebar').style.display =
-    name === 'patterns' ? 'flex' : 'none';
+
+  // Toggle sidebar lists
+  const patList   = document.getElementById('pattern-list');
+  const modList   = document.getElementById('model-list');
+  const title     = document.getElementById('sidebar-title');
+
+  if (name === 'patterns') {{
+    patList.style.display = 'block';
+    modList.style.display = 'none';
+    title.innerHTML = '&#9741; {count} Pattern' + ({count} !== 1 ? 's' : '') + ' found';
+    document.getElementById('sidebar').style.display = 'flex';
+  }} else if (name === 'models') {{
+    patList.style.display = 'none';
+    modList.style.display = 'block';
+    title.innerHTML = '&#9741; ' + MODEL_NAMES.length + ' Model' + (MODEL_NAMES.length !== 1 ? 's' : '');
+    document.getElementById('sidebar').style.display = 'flex';
+  }} else {{
+    document.getElementById('sidebar').style.display = 'none';
+  }}
   requestAnimationFrame(() => fitToViewport(name));
 }}
 
@@ -347,11 +371,23 @@ function showPattern(idx) {{
   loadImage('patterns', URLS[idx]);
 }}
 
-/* ── Interaction: wheel, drag, pinch — wired up per viewport ── */
-['patterns', 'model'].forEach(panel => {{
-  const vp = document.getElementById('vp-' + panel);
+/* ── Model selection ── */
+let curModel = -1;
+function showModel(idx) {{
+  if (curModel >= 0)
+    document.getElementById('mi-' + curModel).classList.remove('active');
+  curModel = idx;
+  document.getElementById('mi-' + idx).classList.add('active');
+  document.getElementById('model-info-bar').innerHTML =
+    '<b>' + MODEL_NAMES[idx] + '</b>';
+  loadImage('models', MODEL_URLS[idx]);
+}}
 
-  /* Mouse wheel zoom */
+/* ── Interaction: wheel, drag, pinch ── */
+['patterns', 'models'].forEach(panel => {{
+  const vp = document.getElementById('vp-' + panel);
+  if (!vp) return;
+
   vp.addEventListener('wheel', e => {{
     e.preventDefault();
     const r = vp.getBoundingClientRect();
@@ -359,16 +395,13 @@ function showPattern(idx) {{
            e.clientX - r.left, e.clientY - r.top);
   }}, {{ passive: false }});
 
-  /* Mouse drag */
   let dragging = false, mx = 0, my = 0;
-
   vp.addEventListener('mousedown', e => {{
     if (e.button !== 0) return;
     e.preventDefault();
     dragging = true;
     mx = e.clientX; my = e.clientY;
   }});
-
   window.addEventListener('mousemove', e => {{
     if (!dragging) return;
     const s = state[panel];
@@ -377,12 +410,9 @@ function showPattern(idx) {{
     mx = e.clientX; my = e.clientY;
     applyTransform(panel);
   }});
-
   window.addEventListener('mouseup', () => {{ dragging = false; }});
 
-  /* Touch: single-finger pan + two-finger pinch */
   let touches = [], lastDist = 0;
-
   vp.addEventListener('touchstart', e => {{
     e.preventDefault();
     touches = Array.from(e.touches);
@@ -391,12 +421,10 @@ function showPattern(idx) {{
         touches[0].clientX - touches[1].clientX,
         touches[0].clientY - touches[1].clientY);
   }}, {{ passive: false }});
-
   vp.addEventListener('touchmove', e => {{
     e.preventDefault();
-    const t   = Array.from(e.touches);
+    const t    = Array.from(e.touches);
     const rect = vp.getBoundingClientRect();
-
     if (t.length === 2 && lastDist) {{
       const dist = Math.hypot(
         t[0].clientX - t[1].clientX,
@@ -415,21 +443,18 @@ function showPattern(idx) {{
     }}
     touches = t;
   }}, {{ passive: false }});
-
   vp.addEventListener('touchend', e => {{
     touches  = Array.from(e.touches);
     lastDist = 0;
   }}, {{ passive: false }});
 }});
 
-/* Re-fit both panels on window resize */
 window.addEventListener('resize', () =>
-  ['patterns', 'model'].forEach(p => {{ if (state[p].imgW) fitToViewport(p); }}));
+  ['patterns', 'models'].forEach(p => {{ if (state[p] && state[p].imgW) fitToViewport(p); }}));
 
 /* ── Boot ── */
-if (HAS_MODEL)  loadImage('model', MODEL_URL);
-if (HAS_PATS)   {{ switchTab('patterns'); showPattern(0); }}
-else if (HAS_MODEL) switchTab('model');
+if (HAS_PATS)         {{ switchTab('patterns'); showPattern(0); }}
+else if (HAS_MODELS)  {{ switchTab('models'); showModel(0); }}
 </script>
 </body>
 </html>"""

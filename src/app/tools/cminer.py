@@ -14,7 +14,6 @@ from cml2graph.core.formats.node_link_fmt import NodeLinkFormat
 
 from app.utils.logger import setup_logging
 from app.core.state import (
-    PARSED_MODELS,
     SESSIONS,
     plugin_manager as _plugin_manager,
     get_session,
@@ -99,9 +98,12 @@ async def cminer_set_parameter_max_nodes(
 @mcp.tool(task=TaskConfig(mode="optional"))
 async def cminer_mine_patterns(
     ctx: Context,
-    file_name: Annotated[str | None, "Optional name of a database file, or loaded model name. If omitted, CMiner uses the configured file or current model."] = None,
 ) -> str:
-    """Use this to mine patterns in the active graph model through CMiner and store the mined patterns in the session."""
+    """
+    Mine patterns across ALL models in the session list (with their current filters applied).
+    Each model's current_graph is exported to a temp file and batch-loaded into CMiner.
+    If no models are in the list, falls back to the configured CMiner db_file.
+    """
 
     logger.debug(f"Session {ctx.session_id}: starting CMiner run...")
     if not ctx or not ctx.session_id:
@@ -111,52 +113,11 @@ async def cminer_mine_patterns(
     cminer     = ctx.lifespan_context["cminer"]
     session = get_session(ctx)
 
-    tmp_graph_file = None
-    current_graph = session.get("current_graph")
+    models = session.get("models", {})
+    tmp_files: list[str] = []
+    nlf = NodeLinkFormat()
 
-    if current_graph is not None:
-        # Export the current (possibly filtered) in-memory graph to a temp file
-        json_text = NodeLinkFormat().render(current_graph)
-        tmp = tempfile.NamedTemporaryFile(
-            mode="w", suffix=".json", delete=False, encoding="utf-8"
-        )
-        tmp.write(json_text)
-        tmp.close()
-        tmp_graph_file = tmp.name
-        cminer.set_db_file(tmp_graph_file)
-        logger.debug(
-            f"Session {session_id}: current_graph has "
-            f"{current_graph.number_of_nodes()} nodes, "
-            f"{current_graph.number_of_edges()} edges. "
-            f"Exported to temp file: {tmp_graph_file}"
-        )
-        logger.debug(f"Temp file content (first 500 chars):\n{json_text[:500]}")
-    else:
-        # Fallback: use explicit file_path or the active model on disk
-        target_path = file_name or session.get("active_model")
-        if target_path:
-            cminer.set_db_file(target_path)
-            file_type = Path(target_path).parent.name
-            await ctx.info(f"Session {session_id}: file type '{file_type}', path '{target_path}'")
-
-            model_info = PARSED_MODELS.get(target_path)
-            if model_info is not None:
-                session["plugin_name"] = model_info["plugin_name"]
-
-    logger.debug(f"Session {session_id}: starting CMiner run with db_file='{cminer.db_file}', "
-                 f"min_support={cminer.min_support}, "
-                 f"min_nodes={cminer.stack.min_nodes}, "
-                 f"max_nodes={cminer.stack.max_nodes}")
-    logger.debug(f"Session {session_id}: db_file exists on disk = {Path(cminer.db_file).is_file() if cminer.db_file else False}")
-    await ctx.info(f"starting CMiner... parameters: "
-                   f"db_file='{cminer.db_file}', "
-                   f"min_support={cminer.min_support}, "
-                   f"min_nodes={cminer.stack.min_nodes}, "
-                   f"max_nodes={cminer.stack.max_nodes}")
-
-    # CMiner appends to self.db without clearing it and DFSStack retains
-    # found_patterns/bit_matrices between runs, so fully reset both before
-    # each mine() call to avoid stale state from previous runs.
+    # Reset CMiner state for a fresh run
     cminer.db = []
     from CMiner.CMinerAPI import DFSStack
     cminer.stack = DFSStack(
@@ -165,15 +126,84 @@ async def cminer_mine_patterns(
         cminer.stack.output_options,
     )
 
-    buf = io.StringIO()
-    try:
-        with contextlib.redirect_stdout(buf):
-            raw = await asyncio.to_thread(cminer.mine)
-    finally:
-        if tmp_graph_file is not None:
-            os.unlink(tmp_graph_file)
+    if models:
+        # Batch mode: export each model's current_graph to a temp file,
+        # then load them all into CMiner's db
+        for name, entry in models.items():
+            graph = entry["current_graph"]
+            json_text = nlf.render(graph)
+            tmp = tempfile.NamedTemporaryFile(
+                mode="w", suffix=".json", delete=False, encoding="utf-8"
+            )
+            tmp.write(json_text)
+            tmp.close()
+            tmp_files.append(tmp.name)
+            logger.debug(
+                f"Session {session_id}: model '{name}' — "
+                f"{graph.number_of_nodes()} nodes, "
+                f"{graph.number_of_edges()} edges → {tmp.name}"
+            )
+            # Load this file into CMiner's db (accumulate)
+            cminer.set_db_file(tmp.name)
+            cminer._read_graphs_from_file()
 
-    output_text: str = raw if isinstance(raw, str) and raw.strip() else buf.getvalue()
+        await ctx.info(
+            f"Batch mining {len(models)} model(s): "
+            + ", ".join(models.keys())
+        )
+
+        # Now run the mining steps directly (skip mine() which would re-read the last file)
+        logger.debug(
+            f"Session {session_id}: batch CMiner run — "
+            f"{len(cminer.db)} graph(s) in db, "
+            f"min_support={cminer.min_support}, "
+            f"min_nodes={cminer.stack.min_nodes}, "
+            f"max_nodes={cminer.stack.max_nodes}"
+        )
+        await ctx.info(
+            f"starting CMiner... {len(cminer.db)} graph(s), "
+            f"min_support={cminer.min_support}, "
+            f"min_nodes={cminer.stack.min_nodes}, "
+            f"max_nodes={cminer.stack.max_nodes}"
+        )
+
+        buf = io.StringIO()
+        # Save original support so _parse_support() doesn't corrupt it across runs
+        original_support = cminer.min_support
+        try:
+            with contextlib.redirect_stdout(buf):
+                cminer._parse_support()
+                cminer._find_start_patterns()
+                await asyncio.to_thread(cminer.mine_all_patterns)
+        finally:
+            cminer.min_support = original_support
+            for f in tmp_files:
+                os.unlink(f)
+
+        # Collect output from the StringSolutionSaver
+        raw = cminer.stack.solution_saver.get_results() if hasattr(cminer.stack.solution_saver, 'get_results') else ""
+        output_text: str = raw if isinstance(raw, str) and raw.strip() else buf.getvalue()
+    else:
+        # No models loaded — fall back to configured db_file
+        logger.debug(
+            f"Session {session_id}: no models in list, using db_file='{cminer.db_file}'"
+        )
+        await ctx.info(
+            f"starting CMiner... parameters: "
+            f"db_file='{cminer.db_file}', "
+            f"min_support={cminer.min_support}, "
+            f"min_nodes={cminer.stack.min_nodes}, "
+            f"max_nodes={cminer.stack.max_nodes}"
+        )
+        buf = io.StringIO()
+        original_support = cminer.min_support
+        try:
+            with contextlib.redirect_stdout(buf):
+                raw = await asyncio.to_thread(cminer.mine)
+        finally:
+            cminer.min_support = original_support
+        output_text: str = raw if isinstance(raw, str) and raw.strip() else buf.getvalue()
+
     logger.debug(f"Raw CMiner output (first 1000 chars):\n{output_text[:1000]}")
 
     patterns = parse_cminer_output(output_text)
@@ -193,7 +223,7 @@ async def cminer_generate_visualization(ctx: Context) -> str:
     """
     Generate an interactive HTML visualization.
     - If patterns have been mined, shows the pattern browser.
-    - If a model is loaded (even with filters applied), shows the model graph tab.
+    - If models are loaded, shows a Models tab with a clickable list of all models.
     - Both tabs are shown together when both are available.
     """
     logger.debug(f"Session {ctx.session_id}: generating visualization...")
@@ -203,13 +233,20 @@ async def cminer_generate_visualization(ctx: Context) -> str:
     session_id = ctx.session_id
     session = get_session(ctx)
     raw_patterns = session.get("patterns", [])
-    current_graph = session.get("current_graph")
+    models = session.get("models", {})
 
-    if not raw_patterns and current_graph is None:
-        return "Nothing to visualize. Load a model with cml2graph_load_model or run cminer_run first."
+    if not raw_patterns and not models:
+        return "Nothing to visualize. Load a model with cml2graph_load_model or run cminer_mine_patterns first."
 
-    # Resolve plugin
-    plugin_name = session.get("plugin_name", "ontouml")
+    # Resolve a plugin for pattern rendering (use first available model's plugin)
+    plugin_name = None
+    for entry in models.values():
+        plugin_name = entry.get("plugin_name")
+        if plugin_name:
+            break
+    if plugin_name is None:
+        plugin_name = "ontouml"
+
     cml2graph_plugin = (
         _plugin_manager.get(plugin_name)
         if plugin_name in _plugin_manager.available
@@ -239,19 +276,26 @@ async def cminer_generate_visualization(ctx: Context) -> str:
                 g = cml2graph_plugin.enrich_pattern(g)
                 plantuml_patterns.append(cml2graph_plugin.render(g))
 
-    # Render the current (possibly filtered) model graph
-    model_plantuml: str | None = None
-    if current_graph is not None and cml2graph_plugin is not None:
+    # Render each model's current_graph to PlantUML
+    models_plantuml: dict[str, str] = {}
+    for name, entry in models.items():
+        graph = entry["current_graph"]
+        p_name = entry.get("plugin_name", plugin_name)
+        plug = (
+            _plugin_manager.get(p_name)
+            if p_name in _plugin_manager.available
+            else cml2graph_plugin
+        )
         try:
-            model_plantuml = cml2graph_plugin.render(current_graph, "plantuml")
+            models_plantuml[name] = plug.render(graph, "plantuml")
         except Exception as e:
-            logger.warning(f"Could not render model graph for visualization: {e}")
+            logger.warning(f"Could not render model '{name}': {e}")
 
     # Build and store HTML
     html = generate_html_visualization(
         patterns_def,
         plantuml_patterns,
-        model_plantuml=model_plantuml,
+        models_plantuml=models_plantuml,
     )
     session["html"] = html
     logger.debug(f"Session {session_id}: generated visualization HTML (length={len(html)})")
@@ -259,8 +303,8 @@ async def cminer_generate_visualization(ctx: Context) -> str:
     parts = []
     if patterns_def:
         parts.append(f"{len(patterns_def)} pattern(s)")
-    if model_plantuml:
-        parts.append("model graph (filtered)" if session.get("active_model") else "model graph")
+    if models_plantuml:
+        parts.append(f"{len(models_plantuml)} model(s)")
 
     return (
         f"Visualization generated: {', '.join(parts)}.\n"

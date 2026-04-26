@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from pathlib import Path
 from typing import Any
 
@@ -18,19 +19,30 @@ def get_session(ctx: Context) -> dict[str, Any]:
     sid = ctx.session_id
     if sid not in SESSIONS:
         SESSIONS[sid] = {
-            "active_model": None, # file path of the active model
-            "current_graph": None, # nx.MultiDiGraph (possibly filtered)
-            "original_graph": None, # pristine copy for reset
-            "plugin_name": None, # which plugin owns this model
+            # Ordered dict of loaded models: key=file_name, value=model_entry
+            # Each model_entry: {"file_path": str, "original_graph": G, "current_graph": G, "plugin_name": str}
+            "models": OrderedDict(),
+            "active_model": None,    # key into models dict (file_name)
             "patterns": [],
             "html": None,
         }
     return SESSIONS[sid]
 
 
+def get_active_model_entry(session: dict) -> dict | None:
+    """Return the model entry dict for the currently active model, or None."""
+    name = session.get("active_model")
+    if name is None:
+        return None
+    return session["models"].get(name)
+
+
 def get_active_plugin(session: dict) -> Any | None:
-    """Resolve the plugin object from the session's plugin_name."""
-    name = session.get("plugin_name")
+    """Resolve the plugin object from the active model's plugin_name."""
+    entry = get_active_model_entry(session)
+    if entry is None:
+        return None
+    name = entry.get("plugin_name")
     if name is None:
         return None
     return plugin_manager.get(name)
