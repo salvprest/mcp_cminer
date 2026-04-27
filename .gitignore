@@ -8,6 +8,7 @@ wheels/
 
 # App files to ignore
 uploads/
+saved_sessions/
 
 # Virtual environments
 .venv

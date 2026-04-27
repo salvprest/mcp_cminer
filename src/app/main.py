@@ -22,8 +22,10 @@ from app.core.state import (
     SESSIONS,
     plugin_manager as _plugin_manager,
 )
+from app.core.auth import create_auth_verifier
 from app.tools.cml2graph import mcp as cml2graph_mcp
 from app.tools.cminer import mcp as cminer_mcp
+from app.tools.session_management import mcp as session_mcp
 
 
 @lifespan
@@ -46,6 +48,7 @@ async def cminer_lifespan(server):
 mcp = FastMCP(
     name="MCP Server for CMiner",
     lifespan=cminer_lifespan,
+    auth=create_auth_verifier(),
     instructions="""
     A server for graph mining on conceptual models.
 
@@ -56,6 +59,8 @@ mcp = FastMCP(
     4. Use cml2graph_filter to focus on specific parts.
     5. Use cminer_run to mine patterns.
     6. Use cminer_generate_visualization to view results.
+    7. Use session_save to persist your work for later.
+    8. Use session_list and session_load to restore previous sessions.
 
     Always call cminer_get_pattern_info or cminer_list_patterns when asked about
     specific patterns — do NOT rely on the visualization HTML for data.
@@ -65,6 +70,7 @@ mcp = FastMCP(
 # Mount sub-servers
 mcp.mount(cml2graph_mcp)
 mcp.mount(cminer_mcp)
+mcp.mount(session_mcp)
 
 
 # ====================== Resources ======================

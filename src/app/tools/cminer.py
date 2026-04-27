@@ -5,18 +5,24 @@ import os
 import tempfile
 from collections import Counter
 from pathlib import Path
+from datetime import datetime
 
 from typing import Annotated
 from fastmcp import FastMCP, Context
 from fastmcp.server.tasks import TaskConfig
+from fastmcp.server.dependencies import get_access_token
+from fastmcp.dependencies import CurrentContext
+
 from cml2graph.core.formats.gspan_fmt import GSpanFormat
 from cml2graph.core.formats.node_link_fmt import NodeLinkFormat
+
 
 from app.utils.logger import setup_logging
 from app.core.state import (
     SESSIONS,
     plugin_manager as _plugin_manager,
     get_session,
+    session_store,
 )
 from app.core.visualization import generate_html_visualization
 from app.utils.cminer_patterns_helper import (
@@ -109,6 +115,7 @@ async def cminer_mine_patterns(
     if not ctx or not ctx.session_id:
         return "Error: No session ID in MCP context."
 
+    client_id = get_access_token().client_id or "anonymous"
     session_id = ctx.session_id
     cminer     = ctx.lifespan_context["cminer"]
     session = get_session(ctx)
@@ -211,6 +218,21 @@ async def cminer_mine_patterns(
     session["patterns"] = [p.__dict__ for p in patterns]
     session["html"] = None
 
+
+    # Auto-save TODO: make this async and non-blocking
+    try:
+        session_store.save_session(
+            client_id=client_id,
+            session_id=ctx.session_id,
+            session_data=session,
+            name=f"Auto-save {datetime.now().strftime('%Y-%m-%d %H:%M')}",
+            description=f"Automatically saved after mining {len(patterns)} patterns"
+        )
+        logger.info(f"Session {ctx.session_id} auto-saved")
+    except Exception as e:
+        logger.warning(f"Could not auto-save session: {e}")
+
+
     await ctx.info(f"Session {session_id}: {len(patterns)} patterns stored.")
     return (
         f"CMiner completed. Found {len(patterns)} pattern(s).\n"
@@ -219,13 +241,14 @@ async def cminer_mine_patterns(
 
 
 @mcp.tool()
-async def cminer_generate_visualization(ctx: Context) -> str:
+async def cminer_generate_visualization(ctx: Context = CurrentContext()) -> str:
     """
     Generate an interactive HTML visualization.
     - If patterns have been mined, shows the pattern browser.
     - If models are loaded, shows a Models tab with a clickable list of all models.
     - Both tabs are shown together when both are available.
     """
+    logger.debug(f"Client ID {get_access_token().client_id}: generating visualization...")
     logger.debug(f"Session {ctx.session_id}: generating visualization...")
     if not ctx or not ctx.session_id:
         return "Error: No session ID in MCP context."

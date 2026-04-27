@@ -198,6 +198,7 @@ class MCPClientManager:
 
     async def _connect_one(self, server_name: str, cfg: Dict) -> None:
         url = cfg.get("url")
+        token = cfg.get("token")
         if not url:
             logger.warning(f"Server '{server_name}' has no URL – skipped")
             return
@@ -209,7 +210,7 @@ class MCPClientManager:
                     "info", f"{_sn}: {data.get('msg', str(msg))}", False
                 )
 
-            sc = SessionContainer(client=Client(url, log_handler=_log))
+            sc = SessionContainer(client=Client(url, log_handler=_log, auth=token))
             self.sessions[server_name] = sc
             await self.exit_stack.enter_async_context(sc.client)
 
@@ -710,6 +711,7 @@ class Pipe:
                 - Mine Graphs Patterns: run CMiner to discover frequent subgraphs or patterns in the loaded models. Dynamically adjust parameters like `min_support`, `min_nodes`, and `max_nodes` to refine the search.
                 - Query & Explore: filter mined patterns by criteria. get stats on specific pattern IDs, generate a full session summary.
                 - Visualize: build an interactive HTML for the loaded models graph and/or the discovered patterns.
+                - Save & Load Sessions: list saved sessions, load previous sessions for continued analysis.
                 
                 Rules:
                 - ALWAYS execute the tools needed to answer the user's query.
@@ -720,6 +722,10 @@ class Pipe:
                 """
             ),
         )
+        MCP_AUTH_TOKEN: str = Field(
+            default="dev-token-admin", #TODO: use this for the token field in the servers config
+            description="Bearer token for MCP authentication."
+        )
         MCP_CONFIG: str = Field(
             default=json.dumps(
                 {
@@ -727,6 +733,7 @@ class Pipe:
                         "cminer_mcp": {
                             "type": "streamable_http",
                             "url": "http://host.docker.internal:8222/mcp",
+                            "token": "dev-token-admin"
                         }
                     }
                 }

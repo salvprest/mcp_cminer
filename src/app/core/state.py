@@ -4,6 +4,7 @@ from typing import Any
 
 from fastmcp import Context
 from cml2graph.core.plugin_manager import PluginManager
+from app.core.session_store import SessionStore
 
 UPLOAD_DIR = Path(__file__).resolve().parents[3] / "uploads"
 # Model graph cache: Key = absolute file path (str), value = {"graph": G, "plugin_name": str}
@@ -12,6 +13,8 @@ PARSED_MODELS: dict[str, dict[str, Any]] = {}
 SESSIONS: dict[str, dict] = {}
 # Singleton plugin manager
 plugin_manager = PluginManager()
+# Singleton session store
+session_store = SessionStore()
 
 
 def get_session(ctx: Context) -> dict[str, Any]:
