@@ -1068,7 +1068,7 @@ class Pipe:
 
         # ── Non-chat tasks — pass-through ─────────────────────────────
         if __task__ and __task__ != "chat":
-            user_obj = Users.get_user_by_id(__user__["id"])
+            user_obj = await Users.get_user_by_id(__user__["id"])
             resp = await generate_chat_completion(
                 __request__,
                 {"model": self.valves.MODEL, "messages": messages, "stream": True},
@@ -1216,7 +1216,7 @@ class Pipe:
                 payload["tools"] = openai_tools
                 payload["tool_choice"] = "auto"
 
-            user_obj = Users.get_user_by_id(__user__["id"])
+            user_obj = await Users.get_user_by_id(__user__["id"])
             ui_blocks: List[str] = []
             fetched_uris: Set[str] = {uri for uri, _, _ in resource_context}
             content = ""

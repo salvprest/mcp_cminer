@@ -9,7 +9,7 @@ from networkx.readwrite import json_graph
 class SessionStore:
     """Persistent storage for MCP sessions, scoped by client_id."""
 
-    def __init__(self, base_dir: Path = Path("saved_sessions")):
+    def __init__(self, base_dir: Path = Path("data/saved_sessions")):
         self.base_dir = base_dir
         self.base_dir.mkdir(parents=True, exist_ok=True)
 

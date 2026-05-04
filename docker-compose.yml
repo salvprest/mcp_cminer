@@ -1,0 +1,38 @@
+services:
+  mcp-cminer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      # Pass the token from your host environment into the build
+      args:
+        - GITHUB_TOKEN=${GITHUB_TOKEN}
+    container_name: mcp-cminer
+
+    ports:
+      - "8222:8222"
+
+    # Persist uploads, sessions and datasets on the host
+    volumes:
+      - ./data:/app/data
+      - ./datasets:/app/datasets:ro   # read-only: datasets are input data
+
+    # Load environment variables (API keys, auth tokens, etc.)
+    env_file:
+      - .env
+
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+    networks:
+      - external_net
+
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+
+    restart: on-failure
+
+networks:
+  external_net:
+    external: true
+    name: shared_cminer-network

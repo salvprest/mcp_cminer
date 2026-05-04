@@ -6,7 +6,8 @@ from fastmcp import Context
 from cml2graph.core.plugin_manager import PluginManager
 from app.core.session_store import SessionStore
 
-UPLOAD_DIR = Path(__file__).resolve().parents[3] / "uploads"
+DATA_DIR = Path(__file__).resolve().parents[3] / "data"
+UPLOAD_DIR = DATA_DIR / "uploads"
 # Model graph cache: Key = absolute file path (str), value = {"graph": G, "plugin_name": str}
 PARSED_MODELS: dict[str, dict[str, Any]] = {}
 # Dataset metadata cache: Key = dataset ZIP path (str), value = DatasetInfo
@@ -16,7 +17,7 @@ SESSIONS: dict[str, dict] = {}
 # Singleton plugin manager
 plugin_manager = PluginManager()
 # Singleton session store
-session_store = SessionStore()
+session_store = SessionStore(DATA_DIR / "saved_sessions")
 
 
 def get_session(ctx: Context) -> dict[str, Any]:
