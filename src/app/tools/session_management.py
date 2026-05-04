@@ -10,8 +10,8 @@ mcp = FastMCP("session_management")
 
 @mcp.tool()
 async def session_save(
-    name: Annotated[str, "name for this session"] = None,
-    description: Annotated[str, "Description of what was mined/analyzed, max 255 characters"] = None,
+    name: Annotated[str, "name for this session, to identify it later"] = None,
+    description: Annotated[str, "Description of what was mined/analyzed, the models and the patterns, to understand the context, max 255 characters"] = None,
     ctx: Context = None,
 ) -> str:
     """

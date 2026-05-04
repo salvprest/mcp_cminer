@@ -8,6 +8,9 @@ from typing import Annotated
 from fastmcp import FastMCP, Context
 from cml2graph.core.prompts import summarize_graph
 from cml2graph.core.formats.node_link_fmt import NodeLinkFormat
+from app.utils.logger import setup_logging
+
+logger = setup_logging("DEBUG", __name__)
 
 from app.core.state import (
     UPLOAD_DIR,
@@ -330,3 +333,150 @@ async def cml2graph_reset_model(
     entry["current_graph"] = copy.deepcopy(entry["original_graph"])
     summary = summarize_graph(entry["current_graph"])
     return f"Model '{key}' reset to original state.\n\n{summary}"
+
+
+
+
+
+
+@mcp.tool()
+async def cml2graph_load_dataset(
+    dataset_name: Annotated[str, "Name of the uploaded dataset to load (without .zip extension)"],
+    limit: Annotated[int | None, "Maximum number of models to load (default: all)"] = None,
+    ctx: Context = None,
+) -> str:
+    """
+    Load all models from an uploaded dataset ZIP file into the session.
+    """
+    from app.core.state import DATASETS
+    if dataset_name not in DATASETS:
+        available = ", ".join(DATASETS.keys()) or "(none)"
+        return (
+            f"Dataset '{dataset_name}' not found. "
+            f"Upload a dataset ZIP file first. Available datasets: {available}"
+        )
+
+    session = get_session(ctx)
+    dataset_data = DATASETS[dataset_name]
+    models_to_load = dataset_data["models"]
+
+    #if limit is not None and limit > 0:
+    #    models_to_load = models_to_load[:limit]
+
+    loaded_count = 0
+    failed_count = 0
+    for model_entry in models_to_load:
+        model_id = model_entry["model_id"]
+        file_path = model_entry["file_path"]
+        model_name = model_entry.get("name", model_id)
+
+        # Use model_id as key to avoid conflicts
+        key = f"{dataset_name}_{model_id}"
+        # Skip if already loaded
+        if key in session["models"]:
+            continue
+
+        try:
+            # Parse the model file
+            if not Path(file_path).exists():
+                logger.warning(f"Model file not found: {file_path}")
+                failed_count += 1
+                continue
+            # Try to parse using NodeLinkFormat
+            text = Path(file_path).read_text(encoding="utf-8")
+            try:
+                data = json.loads(text)
+            except json.JSONDecodeError:
+                failed_count += 1
+                continue
+
+            # Detect plugin
+            graph = None
+            plugin_name = None
+            for p_name in _plugin_manager.available:
+                plugin = _plugin_manager.get(p_name)
+                if plugin.is_valid(data):
+                    tmp = tempfile.NamedTemporaryFile(
+                        mode="w", suffix=".json", delete=False, encoding="utf-8"
+                    )
+                    json.dump(data, tmp, ensure_ascii=False)
+                    tmp.close()
+                    try:
+                        graph = plugin.parse(tmp.name)
+                        plugin_name = p_name
+                    finally:
+                        os.unlink(tmp.name)
+                    break
+
+            # Fallback to NodeLinkFormat
+            if graph is None:
+                try:
+                    nlf = NodeLinkFormat()
+                    graphs = nlf.parse(text)
+                    if graphs:
+                        graph = graphs[0]
+                        plugin_name = "gspan"
+                except Exception:
+                    failed_count += 1
+                    continue
+
+            if graph is None:
+                failed_count += 1
+                continue
+
+            # Add to session
+            session["models"][key] = {
+                "file_path": file_path,
+                "original_graph": copy.deepcopy(graph),
+                "current_graph": copy.deepcopy(graph),
+                "plugin_name": plugin_name,
+                "dataset": dataset_name,
+                "model_id": model_id,
+                "display_name": model_name,
+            }
+            loaded_count += 1
+
+        except Exception as e:
+            logger.exception(f"Failed to load model {model_id}: {e}")
+            failed_count += 1
+
+    # Set first loaded model as active if none is active
+    if session.get("active_model") is None and session["models"]:
+        session["active_model"] = next(iter(session["models"]))
+    
+    total = len(models_to_load)
+    return (
+        f"Dataset '{dataset_name}' ({dataset_data['info'].title}):\n"
+        f"  Loaded: {loaded_count} model(s)\n"
+        f"  Failed: {failed_count} model(s)\n"
+        f"  Total in dataset: {len(dataset_data['models'])}\n\n"
+        f"All loaded models are ready for mining with cminer_mine_patterns.\n"
+    )
+
+
+@mcp.tool()
+async def cml2graph_list_datasets(ctx: Context = None) -> str:
+    """List all uploaded datasets available for loading."""
+    from app.core.state import DATASETS
+    if not DATASETS:
+        return "No datasets uploaded. Upload a dataset ZIP file first."
+
+    lines = [f"Available datasets ({len(DATASETS)}):"]
+    for name, data in DATASETS.items():
+        info = data["info"]
+        loaded_in_session = 0
+        session = get_session(ctx)
+        for model_key in session.get("models", {}).keys():
+            if model_key.startswith(f"{name}_"):
+                loaded_in_session += 1
+
+        lines.append(
+            f"\n  {name}\n"
+            f"    Title: {info.title}\n"
+            f"    Version: {info.version}\n"
+            f"    Models: {len(data['models'])}\n"
+            f"    Loaded in session: {loaded_in_session}\n"
+            f"    Updated: {info.last_updated}"
+        )
+
+    return "\n".join(lines)

@@ -9,6 +9,8 @@ from app.core.session_store import SessionStore
 UPLOAD_DIR = Path(__file__).resolve().parents[3] / "uploads"
 # Model graph cache: Key = absolute file path (str), value = {"graph": G, "plugin_name": str}
 PARSED_MODELS: dict[str, dict[str, Any]] = {}
+# Dataset metadata cache: Key = dataset ZIP path (str), value = DatasetInfo
+DATASETS: dict[str, dict] = {}
 # Per-session mcp state: Key = session_id
 SESSIONS: dict[str, dict] = {}
 # Singleton plugin manager

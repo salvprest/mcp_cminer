@@ -20,12 +20,14 @@ from app.core.state import (
     UPLOAD_DIR,
     PARSED_MODELS,
     SESSIONS,
+    DATASETS,
     plugin_manager as _plugin_manager,
 )
 from app.core.auth import create_auth_verifier
 from app.tools.cml2graph import mcp as cml2graph_mcp
 from app.tools.cminer import mcp as cminer_mcp
 from app.tools.session_management import mcp as session_mcp
+from app.utils.dataset_loader import handle_dataset_upload
 
 
 @lifespan
@@ -140,6 +142,15 @@ async def upload_file(file: UploadFile = File(...)):
     print(f"Received upload: {file.filename} ({file.content_type})")
     logger.debug(f"Upload content type: {file.content_type}")
     content = await file.read()
+
+    # Check if it's a ZIP file (dataset)
+    is_zip = (
+        file.filename.lower().endswith('.zip') 
+        or file.content_type in ('application/zip', 'application/x-zip-compressed')
+    )
+    if is_zip:# TODO: Improve this
+        return await handle_dataset_upload(UPLOAD_DIR, DATASETS, file.filename, content)
+
     try:
         text_content = content.decode("utf-8")
     except UnicodeDecodeError:
