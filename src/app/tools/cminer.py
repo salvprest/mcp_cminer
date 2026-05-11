@@ -65,7 +65,10 @@ async def cminer_set_parameter_min_support(
     support: Annotated[float, "Minimum support threshold."],
     ctx: Context = None,
 ) -> str:
-    """Use this to set the minimum support threshold for the pattern mining through CMiner."""
+    """
+    Use this to set the minimum support threshold for the pattern mining through CMiner.
+    support definition: The number of unique graphs in the dataset that contain at least one instance of the subgraph
+    """
     cminer = ctx.lifespan_context["cminer"]
     cminer.set_min_support(support)
     return f"Minimum support set to: {support}"

@@ -551,6 +551,45 @@ def _parse_tool_calls_from_response(response: Dict) -> List[Dict]:
     return parsed
 
 
+# Matches the exact HTML that _tool_detail_html() produces, so detection
+# is anchored to OUR own format rather than any arbitrary LLM output.
+_FAKE_TOOL_RE = re.compile(
+    r'<details[^>]+type="tool_calls"[^>]+name="([^"]+)"'
+    r'|<summary>🔧 Executed:\s*([\w-]+)</summary>',
+    re.IGNORECASE,
+)
+
+# Matches visualization HTML the LLM generates itself instead of calling
+# the visualization tool. Anchored to the title our server always emits.
+_FAKE_VISUALIZATION_RE = re.compile(
+    r'<title>\s*CMiner\s+Visualization\s*</title>',
+    re.IGNORECASE,
+)
+
+_MAX_FAKE_RETRIES = 3
+
+
+def _detect_fake_tool_execution(
+    content: str, actual_tool_calls: List[Dict]
+) -> Tuple[List[str], str]:
+    """
+    Detect whether the LLM faked tool execution in *content*.
+
+    Returns (fake_tool_names, kind) where kind is:
+      - "fake_call"  — the model mimicked our tool-call HTML widget
+      - "raw_html"   — the model returned raw visualization HTML directly
+      - ""           — no fake detected (fake_tool_names will be [])
+    """
+    if actual_tool_calls or not content:
+        return [], ""
+    fake = [m.group(1) or m.group(2) for m in _FAKE_TOOL_RE.finditer(content)]
+    if fake:
+        return fake, "fake_call"
+    if _FAKE_VISUALIZATION_RE.search(content):
+        return ["cminer_generate_visualization"], "raw_html"
+    return [], ""
+
+
 def _unwrap_llm_response(resp) -> Tuple[Optional[Dict], Optional[str]]:
     """
     Safely unwrap generate_chat_completion result.
@@ -1220,6 +1259,7 @@ class Pipe:
             ui_blocks: List[str] = []
             fetched_uris: Set[str] = {uri for uri, _, _ in resource_context}
             content = ""
+            fake_retry_count = 0
 
             # ── Agentic tool-use loop ─────────────────────────────────
             for step in range(1, self.valves.MAX_ITERATIONS + 1):
@@ -1246,6 +1286,57 @@ class Pipe:
                 message = resp["choices"][0]["message"]
                 content = message.get("content", "") or ""
                 tool_calls = _parse_tool_calls_from_response(resp)
+
+                # ── Fake tool execution guard ─────────────────────────
+                fake_tools, fake_kind = _detect_fake_tool_execution(content, tool_calls)
+                if fake_tools:
+                    fake_retry_count += 1
+                    logger.warning(
+                        f"Step {step}: model faked tool(s) {fake_tools} "
+                        f"(kind={fake_kind}, retry {fake_retry_count}/{_MAX_FAKE_RETRIES})"
+                    )
+                    if fake_retry_count > _MAX_FAKE_RETRIES:
+                        logger.error("Model keeps faking tool execution — aborting")
+                        yield (
+                            "\n\n⚠️ The model repeatedly generated fake tool output "
+                            "instead of calling tools. Try rephrasing your request."
+                        )
+                        return
+                    await self._emit(
+                        __event_emitter__,
+                        "warning",
+                        f"Model faked {', '.join(fake_tools)} — retrying…",
+                        False,
+                    )
+                    # Inject a correction into the LAST user message so the
+                    # model sees the nudge without polluting history with the
+                    # fake response itself.
+                    tool_list = ', '.join(fake_tools)
+                    if fake_kind == "raw_html":
+                        correction = (
+                            f"\n\n[CORRECTION: you just returned a raw HTML visualization "
+                            f"instead of using the tool-calling API. "
+                            f"Do NOT generate or embed HTML in your response. "
+                            f"Call {tool_list} via the tool-use mechanism to produce "
+                            f"the visualization — the system will render it automatically.]"
+                        )
+                    else:  # fake_call
+                        correction = (
+                            f"\n\n[CORRECTION: you just generated fake tool-call markup for "
+                            f"{tool_list} instead of using the function-calling API. "
+                            f"Do NOT generate <details> / <summary> HTML yourself. "
+                            f"Call {tool_list} via the tool-use mechanism now.]"
+                        )
+                    for i in range(len(chat_msgs) - 1, -1, -1):
+                        if chat_msgs[i]["role"] == "user" and isinstance(
+                            chat_msgs[i].get("content"), str
+                        ):
+                            chat_msgs[i] = {
+                                **chat_msgs[i],
+                                "content": chat_msgs[i]["content"] + correction,
+                            }
+                            break
+                    continue
 
                 if tool_calls:
                     assistant_msg: Dict = {"role": "assistant", "content": content}
