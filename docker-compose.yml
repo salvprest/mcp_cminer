@@ -20,6 +20,9 @@ services:
     env_file:
       - .env
 
+    environment:
+      - PLANTUML_SERVER_URL=http://plantuml:8080
+
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
@@ -30,6 +33,18 @@ services:
       - 8.8.8.8
       - 8.8.4.4
 
+    depends_on:
+      - plantuml
+
+    restart: on-failure
+
+  plantuml:
+    image: plantuml/plantuml-server:jetty
+    environment:
+      - JAVA_OPTS=-Xmx1g
+      - PLANTUML_LIMIT_SIZE=8192
+    networks:
+      - external_net
     restart: on-failure
 
 networks:

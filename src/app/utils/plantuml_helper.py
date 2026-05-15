@@ -1,8 +1,12 @@
 import base64
+import os
 import string
 import zlib
 
-PLANTUML_SERVER = "https://www.plantuml.com/plantuml"
+_PUBLIC_PLANTUML = "https://www.plantuml.com/plantuml"
+# In Docker Compose the env var is set to http://plantuml:8080.
+# In local dev (no env var) we fall back to the public server.
+PLANTUML_SERVER: str = os.environ.get("PLANTUML_SERVER_URL", _PUBLIC_PLANTUML)
 
 _STANDARD_ALPHABET = string.ascii_uppercase + string.ascii_lowercase + string.digits + "+/"
 _PLANTUML_ALPHABET  = string.digits + string.ascii_uppercase + string.ascii_lowercase + "-_"
