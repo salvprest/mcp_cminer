@@ -751,7 +751,14 @@ class Pipe:
                 - Query & Explore: filter mined patterns by criteria. get stats on specific pattern IDs, generate a full session summary.
                 - Visualize: build an interactive HTML for the loaded models graph and/or the discovered patterns.
                 - Save & Load Sessions: list saved sessions, load previous sessions for continued analysis.
-                
+
+                Interative visualization, to assure to the user an intercative visualization experience,
+                you have to generate or update the visualization after:
+                - Mining patterns,
+                - Loading, removing, or clearing models,
+                - Applying filters,
+                - Loading a saved session.
+
                 Rules:
                 - ALWAYS execute the tools needed to answer the user's query.
                 - Do NOT fake the tools execution.
@@ -1260,6 +1267,7 @@ class Pipe:
             fetched_uris: Set[str] = {uri for uri, _, _ in resource_context}
             content = ""
             fake_retry_count = 0
+            called_tools: Set[str] = set()
 
             # ── Agentic tool-use loop ─────────────────────────────────
             for step in range(1, self.valves.MAX_ITERATIONS + 1):
@@ -1339,6 +1347,7 @@ class Pipe:
                     continue
 
                 if tool_calls:
+                    called_tools.update(tc["name"] for tc in tool_calls)
                     assistant_msg: Dict = {"role": "assistant", "content": content}
                     if message.get("tool_calls"):
                         assistant_msg["tool_calls"] = message["tool_calls"]
@@ -1358,6 +1367,39 @@ class Pipe:
                 await self._emit(
                     __event_emitter__, "warning", "Max iterations reached.", False
                 )
+
+            # ── Post-loop: auto-generate visualization if needed ───────
+            _VIZ_TRIGGER_TOOLS = {
+                "cminer_mine_patterns",
+                "cml2graph_load_model",
+                "cml2graph_remove_model",
+                "cml2graph_clear_models",
+                "cml2graph_filter",
+                "cml2graph_reset_model",
+                "session_load",
+            }
+            if (
+                called_tools & _VIZ_TRIGGER_TOOLS
+                and "cminer_generate_visualization" not in called_tools
+            ):
+                logger.info(
+                    "Auto-triggering cminer_generate_visualization "
+                    f"(viz-affecting tools called: {called_tools & _VIZ_TRIGGER_TOOLS})"
+                )
+                await self._emit(
+                    __event_emitter__, "info",
+                    "Updating visualization…", False,
+                )
+                viz_tc = [{
+                    "name": "cminer_generate_visualization",
+                    "arguments": {},
+                    "id": f"auto_viz_{int(time.time())}",
+                }]
+                viz_msgs = await self._execute_tool_calls(
+                    viz_tc, mgr, ui_blocks, fetched_uris, __event_emitter__
+                )
+                # Add to chat context so the LLM's final answer can reference it
+                chat_msgs.extend(viz_msgs)
 
             # ── Post-loop: auto-fetch URIs in LLM final answer ────────
             # Skip visualization URIs here — they were already fetched

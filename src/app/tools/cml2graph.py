@@ -134,7 +134,8 @@ async def cml2graph_load_model(
         f"{summary}\n\n"
         f"Use cml2graph_list_filters to see available filters and their parameter details.\n"
         f"Use cml2graph_explain_model for a detailed analysis prompt.\n"
-        f"Use cml2graph_list_models to see all loaded models."
+        f"Use cml2graph_list_models to see all loaded models.\n"
+        f"Note: call cminer_generate_visualization to update the visualization."
     )
 
 
@@ -200,7 +201,10 @@ async def cml2graph_remove_model(
 
     remaining = len(session["models"])
     active = session["active_model"] or "(none)"
-    return f"Removed '{key}'. {remaining} model(s) remaining. Active: {active}"
+    result = f"Removed '{key}'. {remaining} model(s) remaining. Active: {active}"
+    if remaining > 0 or session.get("patterns"):
+        result += "\nNote: call cminer_generate_visualization to update the visualization."
+    return result
 
 
 @mcp.tool()
@@ -209,7 +213,10 @@ async def cml2graph_clear_models(ctx: Context = None) -> str:
     session = get_session(ctx)
     session["models"].clear()
     session["active_model"] = None
-    return "All models cleared from the list."
+    result = "All models cleared from the list."
+    if session.get("patterns"):
+        result += "\nNote: call cminer_generate_visualization to update the visualization."
+    return result
 
 
 @mcp.tool()
@@ -297,7 +304,10 @@ async def cml2graph_filter(
 
     entry["current_graph"] = result
     summary = summarize_graph(result)
-    return f"Filter '{filter_name}' applied to '{session['active_model']}'.\n\n{summary}"
+    return (
+        f"Filter '{filter_name}' applied to '{session['active_model']}'.\n\n{summary}\n"
+        f"Note: call cminer_generate_visualization to update the visualization."
+    )
 
 
 @mcp.tool()
@@ -332,7 +342,10 @@ async def cml2graph_reset_model(
     entry = session["models"][key]
     entry["current_graph"] = copy.deepcopy(entry["original_graph"])
     summary = summarize_graph(entry["current_graph"])
-    return f"Model '{key}' reset to original state.\n\n{summary}"
+    return (
+        f"Model '{key}' reset to original state.\n\n{summary}\n"
+        f"Note: call cminer_generate_visualization to update the visualization."
+    )
 
 
 

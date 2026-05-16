@@ -24,12 +24,12 @@ from app.core.state import (
     get_session,
     session_store,
 )
-from app.core.visualization import generate_html_visualization
 from app.utils.cminer_patterns_helper import (
     PatternInfo,
     parse_cminer_output,
     pattern_to_tve_gdata,
 )
+from app.utils.plantuml_helper import plantuml_encode
 
 logger = setup_logging("DEBUG", __name__)
 
@@ -219,7 +219,7 @@ async def cminer_mine_patterns(
     patterns = parse_cminer_output(output_text)
 
     session["patterns"] = [p.__dict__ for p in patterns]
-    session["html"] = None
+    session["viz_data"] = None
 
 
     # Auto-save TODO: make this async and non-blocking
@@ -239,7 +239,8 @@ async def cminer_mine_patterns(
     await ctx.info(f"Session {session_id}: {len(patterns)} patterns stored.")
     return (
         f"CMiner completed. Found {len(patterns)} pattern(s).\n"
-        f"Pattern data resource URI: cminer://sessions/{session_id}/patterns"
+        f"Pattern data resource URI: cminer://sessions/{session_id}/patterns\n"
+        f"Note: call cminer_generate_visualization to update the visualization."
     )
 
 
@@ -317,14 +318,31 @@ async def cminer_generate_visualization(ctx: Context = CurrentContext()) -> str:
         except Exception as e:
             logger.warning(f"Could not render model '{name}': {e}")
 
-    # Build and store HTML
-    html = generate_html_visualization(
-        patterns_def,
-        plantuml_patterns,
-        models_plantuml=models_plantuml,
-    )
-    session["html"] = html
-    logger.debug(f"Session {session_id}: generated visualization HTML (length={len(html)})")
+    # Build and store visualization data (encoded strings + metadata)
+    viz_patterns = []
+    for idx, p in enumerate(patterns_def):
+        viz_patterns.append({
+            "id": p.id,
+            "support": p.support,
+            "frequency": p.frequency,
+            "nodes": len(p.nodes),
+            "edges": len(p.edges),
+            "encoded": plantuml_encode(plantuml_patterns[idx]),
+        })
+
+    viz_models = []
+    for name, puml in models_plantuml.items():
+        viz_models.append({
+            "name": name,
+            "encoded": plantuml_encode(puml),
+        })
+
+    session["viz_data"] = {
+        "patterns": viz_patterns,
+        "models": viz_models,
+        "version": int(__import__("time").time() * 1000),
+    }
+    logger.debug(f"Session {session_id}: stored viz_data ({len(viz_patterns)} patterns, {len(viz_models)} models)")
 
     parts = []
     if patterns_def:
@@ -334,6 +352,7 @@ async def cminer_generate_visualization(ctx: Context = CurrentContext()) -> str:
 
     return (
         f"Visualization generated: {', '.join(parts)}.\n"
+        f"View it at: /visualization/{session_id}\n"
         f"Visualization resource URI: cminer://sessions/{session_id}/private/visualization"
     )
 

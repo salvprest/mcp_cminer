@@ -4,11 +4,14 @@ logger = setup_logging("DEBUG", __name__.replace(".main", ""))
 import json
 import os
 import tempfile
+import httpx
 import uvicorn
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, Query
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response as FastAPIResponse, HTMLResponse
 from fastmcp import FastMCP
 from fastmcp.server.lifespan import lifespan
 from fastmcp.utilities.lifespan import combine_lifespans
@@ -81,11 +84,13 @@ mcp.mount(session_mcp)
 def get_pattern_visualization(session_id: str) -> str:
     """
     Self-contained HTML visualization for the patterns mined in the given session.
-    This resource returns potentially large HTML — the pipe renders it as an
-    iframe widget and never puts the full content in the LLM context.
+    This resource returns a lightweight HTML shell that fetches data lazily
+    from the CMiner API endpoints. Open WebUI renders it as an inline artifact.
     """
-    if session_id in SESSIONS and SESSIONS[session_id].get("html"):
-        return SESSIONS[session_id]["html"]
+    if session_id in SESSIONS and SESSIONS[session_id].get("viz_data"):
+        from app.core.visualization import generate_html_visualization
+        version = SESSIONS[session_id]["viz_data"].get("version", 0)
+        return generate_html_visualization(session_id, version=version)
     return (
         "<h1>Visualization not found.</h1>"
         "<p>Run <code>cminer_generate_visualization</code> first.</p>"
@@ -130,6 +135,15 @@ async def app_lifespan(app: FastAPI):
 # The FastAPI app mounts the MCP server at /mcp and also provides a REST endpoint for file uploads.
 mcp_app = mcp.http_app(path="/")
 app = FastAPI(title="CMiner API", lifespan=combine_lifespans(app_lifespan, mcp_app.lifespan))
+
+# Allow cross-origin requests from iframe srcdoc (opaque "null" origin)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["GET"],
+    allow_headers=["*"],
+)
+
 app.mount("/mcp", mcp_app)
 
 
@@ -214,6 +228,92 @@ async def list_uploads():
         if f.is_file():
             files.append(str(f.relative_to(UPLOAD_DIR)))
     return {"upload_dir": str(UPLOAD_DIR), "files": sorted(files)}
+
+
+# ====================== Visualization page & API ======================
+
+_http_client: httpx.AsyncClient | None = None
+
+
+def _get_http_client() -> httpx.AsyncClient:
+    global _http_client
+    if _http_client is None or _http_client.is_closed:
+        _http_client = httpx.AsyncClient(timeout=15.0)
+    return _http_client
+
+
+@app.get("/visualization/{session_id}", response_class=HTMLResponse)
+async def visualization_page(session_id: str):
+    """Serve the lightweight HTML shell for the visualization viewer."""
+    if session_id not in SESSIONS or not SESSIONS[session_id].get("viz_data"):
+        return HTMLResponse(
+            "<h1>Session not found or visualization not generated.</h1>",
+            status_code=404,
+        )
+    from app.core.visualization import generate_html_visualization
+    return HTMLResponse(generate_html_visualization(session_id))
+
+
+@app.get("/api/sessions/{session_id}/meta")
+async def session_meta(session_id: str):
+    """Return summary metadata for the visualization."""
+    if session_id not in SESSIONS or not SESSIONS[session_id].get("viz_data"):
+        return FastAPIResponse(status_code=404, content='{"error":"not found"}')
+    viz = SESSIONS[session_id]["viz_data"]
+    return {
+        "num_patterns": len(viz.get("patterns", [])),
+        "num_models": len(viz.get("models", [])),
+    }
+
+
+@app.get("/api/sessions/{session_id}/patterns")
+async def session_patterns(
+    session_id: str,
+    offset: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=200),
+):
+    """Return a page of pattern metadata + encoded PlantUML strings."""
+    if session_id not in SESSIONS or not SESSIONS[session_id].get("viz_data"):
+        return FastAPIResponse(status_code=404, content='{"error":"not found"}')
+    all_patterns = SESSIONS[session_id]["viz_data"].get("patterns", [])
+    page = all_patterns[offset : offset + limit]
+    return {"patterns": page, "total": len(all_patterns)}
+
+
+@app.get("/api/sessions/{session_id}/models")
+async def session_models(session_id: str):
+    """Return all model names + encoded PlantUML strings."""
+    if session_id not in SESSIONS or not SESSIONS[session_id].get("viz_data"):
+        return FastAPIResponse(status_code=404, content='{"error":"not found"}')
+    return {"models": SESSIONS[session_id]["viz_data"].get("models", [])}
+
+
+@app.get("/plantuml/svg/{encoded:path}")
+async def plantuml_svg_proxy(encoded: str):
+    """
+    Async proxy for PlantUML SVG requests.  The browser calls this endpoint;
+    the server forwards to the internal PlantUML container (or public server).
+    """
+    from app.utils.plantuml_helper import PLANTUML_SERVER
+    url = f"{PLANTUML_SERVER}/svg/{encoded}"
+    client = _get_http_client()
+    try:
+        resp = await client.get(url)
+        return FastAPIResponse(
+            content=resp.content,
+            media_type="image/svg+xml",
+            status_code=resp.status_code,
+        )
+    except httpx.HTTPError as exc:
+        error_svg = (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="60">'
+            '<rect width="100%" height="100%" fill="#fff0f0" rx="4"/>'
+            f'<text x="10" y="35" font-family="monospace" font-size="13" fill="#c0392b">PlantUML error: {exc}</text>'
+            '</svg>'
+        )
+        return FastAPIResponse(
+            content=error_svg, media_type="image/svg+xml", status_code=502,
+        )
 
 
 def main():

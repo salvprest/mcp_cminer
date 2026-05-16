@@ -102,7 +102,7 @@ class SessionStore:
         return {
             "models": models,
             "patterns": patterns,
-            "html": None,  # Will be regenerated on demand
+            "viz_data": None,  # Will be regenerated on demand
             "active_model": metadata.get("active_model"),
             "created_at": metadata.get("created_at"),
         }

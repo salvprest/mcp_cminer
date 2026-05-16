@@ -30,7 +30,10 @@ def get_session(ctx: Context) -> dict[str, Any]:
             "models": OrderedDict(),
             "active_model": None,    # key into models dict (file_name)
             "patterns": [],
-            "html": None,
+            # Pre-computed visualization data for the API
+            # {"patterns": [{"id","support","frequency","nodes","edges","encoded"},...],
+            #  "models":   [{"name","encoded"},...]}
+            "viz_data": None,
         }
     return SESSIONS[sid]
 

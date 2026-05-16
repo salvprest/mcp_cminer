@@ -94,6 +94,8 @@ async def session_load(
     #        f"  - cminer_filter_patterns\n"
     #        f"  - cminer_generate_visualization (to regenerate the viz)"
     #    )
+    if num_models > 0 or num_patterns > 0:
+        summary += "Note: call cminer_generate_visualization to update the visualization."
     return summary
 
 
