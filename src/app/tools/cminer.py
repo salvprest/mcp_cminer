@@ -9,9 +9,12 @@ from datetime import datetime
 
 from typing import Annotated
 from fastmcp import FastMCP, Context
+from fastmcp.server.lifespan import lifespan
 from fastmcp.server.tasks import TaskConfig
 from fastmcp.server.dependencies import get_access_token
 from fastmcp.dependencies import CurrentContext
+
+from CMiner import CMinerAPI
 
 from cml2graph.core.formats.gspan_fmt import GSpanFormat
 from cml2graph.core.formats.node_link_fmt import NodeLinkFormat
@@ -33,7 +36,25 @@ from app.utils.plantuml_helper import plantuml_encode
 
 logger = setup_logging("DEBUG", __name__)
 
-mcp = FastMCP("cminer")
+
+@lifespan
+async def _cminer_lifespan(server):
+    cminer = CMinerAPI(
+        db_file="datasets/Datasets/test/test.data",
+        support=1,
+        max_nodes=10,
+        string_output=True,
+        show_mappings=True,
+        directed_graph=True,
+        with_frequencies=True,
+    )
+    try:
+        yield {"cminer": cminer}
+    finally:
+        cminer.close()
+
+
+mcp = FastMCP("cminer", lifespan=_cminer_lifespan)
 
 
 # ================== Parameter tools ======================
@@ -379,7 +400,7 @@ async def cminer_get_pattern_info(
     patterns = session.get("patterns", [])
     for p in patterns:
         if p["id"] == pattern_id:
-            node_lines = [f"  v {nid} {lbl}" for nid, lbl in p["nodes"]]
+            node_lines = [f"  v {nid} {' '.join(lbl)}" for nid, lbl in p["nodes"]]
             edge_lines = [f"  e {src} {dst} {lbl}" for src, dst, lbl in p["edges"]]
             return (
                 f"Pattern #{p['id']}\n"

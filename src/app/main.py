@@ -13,7 +13,6 @@ from fastapi import FastAPI, UploadFile, File, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response as FastAPIResponse, HTMLResponse
 from fastmcp import FastMCP
-from fastmcp.server.lifespan import lifespan
 from fastmcp.utilities.lifespan import combine_lifespans
 
 from CMiner import CMinerAPI
@@ -33,26 +32,8 @@ from app.tools.session_management import mcp as session_mcp
 from app.utils.dataset_loader import handle_dataset_upload
 
 
-@lifespan
-async def cminer_lifespan(server):
-    cminer = CMinerAPI(
-        db_file="datasets/Datasets/test/test.data",
-        support=1,
-        max_nodes=10,
-        string_output=True,
-        show_mappings=True,
-        directed_graph=True,
-        with_frequencies=True,
-    )
-    try:
-        yield {"cminer": cminer}
-    finally:
-        cminer.close()
-
-
 mcp = FastMCP(
     name="MCP Server for CMiner",
-    lifespan=cminer_lifespan,
     auth=create_auth_verifier(),
     instructions="""
     A server for graph mining on conceptual models.

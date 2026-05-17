@@ -6,7 +6,7 @@ from dataclasses import dataclass
 @dataclass
 class PatternInfo:
     id: int
-    nodes: list[tuple] # (node_id, label)
+    nodes: list[tuple] # (node_id, labels: list[str])
     edges: list[tuple] # (src, dst, label)
     support: float
     frequency: int
@@ -32,9 +32,11 @@ def parse_cminer_output(text: str) -> list[PatternInfo]:
             if m:
                 pat_id = int(m.group(1))
                 continue
-            m = re.match(r'v\s+(\d+)(?:\s+(\S+))?', line)
+            m = re.match(r'v\s+(\d+)(?:\s+(.*))?', line)
             if m:
-                nodes.append((int(m.group(1)), m.group(2) or ""))
+                node_id = int(m.group(1))
+                labels = m.group(2).strip().split() if m.group(2) else []
+                nodes.append((node_id, labels))
                 continue
             m = re.match(r'e\s+(\d+)\s+(\d+)(?:\s+(\S+))?', line)
             if m:
@@ -59,8 +61,8 @@ def parse_cminer_output(text: str) -> list[PatternInfo]:
 def pattern_to_tve_gdata(pattern: PatternInfo, index: int = None) -> str:
     idx   = pattern.id if index is None else index
     lines = [f"t # {idx}"]
-    for node_id, label in pattern.nodes:
-        lines.append(f"v {node_id} {label}")
+    for node_id, labels in pattern.nodes:
+        lines.append(f"v {node_id} {' '.join(labels) if labels else 'unknown'}")
     for src, dst, label in pattern.edges:
         lines.append(f"e {src} {dst} {label}")
     return "\n".join(lines)
