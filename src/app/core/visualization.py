@@ -14,7 +14,7 @@ This means the HTML file size is constant regardless of pattern count.
 
 import os
 
-_DEFAULT_BASE_URL = os.environ.get("CMINER_BASE_URL", "http://localhost:8222").rstrip("/")
+_DEFAULT_BASE_URL = os.environ.get("CMINER_BASE_URL", "").rstrip("/")
 
 
 def generate_html_visualization(session_id: str, base_url: str = _DEFAULT_BASE_URL, version: int = 0) -> str:
