@@ -29,6 +29,7 @@ from app.core.auth import create_auth_verifier
 from app.tools.cml2graph import mcp as cml2graph_mcp
 from app.tools.cminer import mcp as cminer_mcp
 from app.tools.session_management import mcp as session_mcp
+from app.utils.cminer_patterns_helper import resolve_occurrence_highlights
 from app.utils.dataset_loader import handle_dataset_upload
 
 
@@ -240,10 +241,13 @@ async def session_meta(session_id: str):
     """Return summary metadata for the visualization."""
     if session_id not in SESSIONS or not SESSIONS[session_id].get("viz_data"):
         return FastAPIResponse(status_code=404, content='{"error":"not found"}')
-    viz = SESSIONS[session_id]["viz_data"]
+    sess = SESSIONS[session_id]
+    viz  = sess["viz_data"]
     return {
         "num_patterns": len(viz.get("patterns", [])),
-        "num_models": len(viz.get("models", [])),
+        "num_models":   len(viz.get("models", [])),
+        # See Focus Protocol in app/core/visualization.py
+        "focus":        sess.get("focus"),
     }
 
 
@@ -267,6 +271,96 @@ async def session_models(session_id: str):
     if session_id not in SESSIONS or not SESSIONS[session_id].get("viz_data"):
         return FastAPIResponse(status_code=404, content='{"error":"not found"}')
     return {"models": SESSIONS[session_id]["viz_data"].get("models", [])}
+
+
+@app.get("/api/sessions/{session_id}/patterns/{pattern_id}/models")
+async def pattern_matched_models(session_id: str, pattern_id: int):
+    """
+    Return models that contain a specific pattern, with highlighted PlantUML encodings.
+    Results are cached in session['highlights'] after the first request.
+    """
+    import copy
+    from app.utils.plantuml_helper import plantuml_encode
+
+    if session_id not in SESSIONS:
+        return FastAPIResponse(status_code=404, content='{"error":"session not found"}')
+
+    session  = SESSIONS[session_id]
+    patterns = session.get("patterns", [])
+    models   = session.get("models", {})
+
+    pattern = next((p for p in patterns if p["id"] == pattern_id), None)
+    if pattern is None:
+        return FastAPIResponse(status_code=404, content='{"error":"pattern not found"}')
+
+    mappings = pattern.get("mappings") or {}
+    if not mappings:
+        return {"models": []}
+
+    result = []
+    for model_name, model_entry in models.items():
+        # Match model name to mapping keys (CMiner uses sanitized names)
+        occurrences = None
+        for graph_name, occs in mappings.items():
+            if graph_name == model_name or graph_name == model_name.replace(".json", ""):
+                occurrences = occs
+                break
+        if occurrences is None:
+            safe_name = "".join(
+                c if c.isalnum() or c in ("_", "-") else "_" for c in model_name
+            )
+            for graph_name, occs in mappings.items():
+                if graph_name == safe_name:
+                    occurrences = occs
+                    break
+        if not occurrences:
+            continue
+
+        cache_key  = f"{pattern_id}_{model_name}"
+        highlights = session.setdefault("highlights", {})
+
+        if cache_key in highlights:
+            encoded = highlights[cache_key]["encoded"]
+        else:
+            # Generate highlighted diagram on-demand
+            try:
+                graph       = copy.deepcopy(model_entry["current_graph"])
+                plugin_name = model_entry.get("plugin_name", "ontouml")
+                plugin = (
+                    _plugin_manager.get(plugin_name)
+                    if plugin_name in _plugin_manager.available
+                    else _plugin_manager.get("ontouml")
+                )
+
+                highlighted_nodes, highlighted_edges = resolve_occurrence_highlights(occurrences, graph)
+
+                for node in graph.nodes():
+                    if node in highlighted_nodes:
+                        graph.nodes[node]["highlight"]       = True
+                        graph.nodes[node]["highlight_line_color"] = "#E84A4A"
+                for src, dst, key in graph.edges(keys=True):
+                    if (src, dst, key) in highlighted_edges:
+                        graph.edges[src, dst, key]["highlight"]       = True
+                        graph.edges[src, dst, key]["highlight_line_color"] = "#E84A4A"
+
+                plantuml_text = plugin.render(graph, "plantuml")
+                encoded       = plantuml_encode(plantuml_text)
+                highlights[cache_key] = {"encoded": encoded}
+            except Exception as exc:
+                logger.warning(f"Could not generate highlight for '{model_name}': {exc}")
+                # Fall back to the un-highlighted encoded string stored in viz_data
+                viz_models = session.get("viz_data", {}).get("models", [])
+                encoded    = next(
+                    (m["encoded"] for m in viz_models if m["name"] == model_name), ""
+                )
+
+        result.append({
+            "name":              model_name,
+            "encoded_highlighted": encoded,
+            "num_occurrences":   len(occurrences),
+        })
+
+    return {"models": result}
 
 
 @app.get("/plantuml/svg/{encoded:path}")

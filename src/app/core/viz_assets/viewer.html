@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CMiner Visualization</title>
+  <!-- v:__VERSION__ -->
+  <style>__CSS__</style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div id="sidebar">
+    <div id="sidebar-tabs">
+      <button class="s-tab-btn" id="tab-models" onclick="switchTab('models')">Models</button>
+      <button class="s-tab-btn" id="tab-patterns" onclick="switchTab('patterns')">Patterns</button>
+    </div>
+    <h2 id="sidebar-title">Loading…</h2>
+    <div class="sidebar-list" id="pattern-list" style="display:none"></div>
+    <div class="sidebar-list" id="model-list" style="display:none"></div>
+    <div class="page-bar" id="pattern-pager" style="display:none">
+      <button id="pg-prev" onclick="loadPatternPage(curPage-1)">&laquo; Prev</button>
+      <span id="pg-info"></span>
+      <button id="pg-next" onclick="loadPatternPage(curPage+1)">Next &raquo;</button>
+    </div>
+  </div>
+
+  <!-- Resizer Handle -->
+  <div id="resizer"></div>
+
+  <!-- Main -->
+  <div id="main">
+    <button id="collapse-btn" title="Toggle sidebar" onclick="toggleSidebar()">&#9664;</button>
+
+    <div id="top-bar">
+      <div id="pane-title">Loading…</div>
+      <div id="pane-meta"></div>
+      <button id="clear-filter-btn" onclick="clearFilter()">&#x2715; Clear Filter</button>
+    </div>
+
+    <!-- Patterns panel -->
+    <div id="panel-patterns" class="panel">
+      <div class="viewport" id="vp-patterns">
+        <div class="canvas" id="canvas-patterns">
+          <div id="pattern-svg" class="svg-container"></div>
+        </div>
+        <div class="status-msg" id="status-patterns">No pattern selected</div>
+        <div class="zoom-controls">
+          <button class="zoom-btn" onclick="zoomStep('patterns',1.25)" title="Zoom in">+</button>
+          <button class="zoom-btn" onclick="zoomStep('patterns',0.8)"  title="Zoom out">&minus;</button>
+          <button class="zoom-btn" onclick="resetZoom('patterns')"     title="Fit to window">&#x2922;</button>
+        </div>
+        <div class="zoom-hint">scroll / pinch &middot; drag to pan</div>
+      </div>
+    </div>
+
+    <!-- Models panel -->
+    <div id="panel-models" class="panel">
+      <div class="viewport" id="vp-models">
+        <div class="canvas" id="canvas-models">
+          <div id="model-svg" class="svg-container"></div>
+        </div>
+        <div class="status-msg" id="status-models">No model selected</div>
+        <div class="zoom-controls">
+          <button class="zoom-btn" onclick="zoomStep('models',1.25)" title="Zoom in">+</button>
+          <button class="zoom-btn" onclick="zoomStep('models',0.8)"  title="Zoom out">&minus;</button>
+          <button class="zoom-btn" onclick="resetZoom('models')"     title="Fit to window">&#x2922;</button>
+        </div>
+        <div class="zoom-hint">scroll / pinch &middot; drag to pan</div>
+      </div>
+    </div>
+  </div>
+
+<script>
+const SID = "__SESSION_ID__";
+const API = "__BASE_URL__";
+const PAGE_SZ = 50;
+__JS__
+</script>
+</body>
+</html>

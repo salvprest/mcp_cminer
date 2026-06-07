@@ -1371,11 +1371,17 @@ class Pipe:
             # ── Post-loop: auto-generate visualization if needed ───────
             _VIZ_TRIGGER_TOOLS = {
                 "cminer_mine_patterns",
+                "cminer_get_pattern_info",
+                "cminer_filter_patterns",
+                "cminer_highlight_pattern",
+
                 "cml2graph_load_model",
+                "cml2graph_select_model",
                 "cml2graph_remove_model",
                 "cml2graph_clear_models",
                 "cml2graph_filter",
                 "cml2graph_reset_model",
+                "cml2graph_load_dataset",
                 "session_load",
             }
             if (

@@ -20,6 +20,16 @@ plugin_manager = PluginManager()
 session_store = SessionStore(DATA_DIR / "saved_sessions")
 
 
+def _empty_focus() -> dict[str, Any]:
+    """Default visualization focus, see Focus Protocol in visualization.py."""
+    return {
+        "tab": None,            # "patterns" | "models" | None
+        "pattern_id": None,     # int | None
+        "model_name": None,     # str  | None
+        "highlight": None,      # None | {"pattern_id": int, "model_name": str, "occurrence_index": int|None}
+    }
+
+
 def get_session(ctx: Context) -> dict[str, Any]:
     """Get or create the session dict for this MCP connection."""
     sid = ctx.session_id
@@ -34,8 +44,47 @@ def get_session(ctx: Context) -> dict[str, Any]:
             # {"patterns": [{"id","support","frequency","nodes","edges","encoded"},...],
             #  "models":   [{"name","encoded"},...]}
             "viz_data": None,
+            # Visualization focus, see Focus Protocol in app/core/visualization.py
+            "focus": _empty_focus(),
         }
+    # Backfill focus for sessions restored from disk that predate this field
+    if "focus" not in SESSIONS[sid]:
+        SESSIONS[sid]["focus"] = _empty_focus()
     return SESSIONS[sid]
+
+
+_UNSET = object()
+
+
+def set_focus(
+    session: dict,
+    *,
+    tab: Any = _UNSET,
+    pattern_id: Any = _UNSET,
+    model_name: Any = _UNSET,
+    highlight: Any = None,
+) -> None:
+    """
+    Update the visualization focus for this session.
+
+    `tab`, `pattern_id` and `model_name` are merged: only fields explicitly
+    passed are modified; pass `None` to explicitly clear them.
+
+    `highlight` is different, it is **cleared by default** on every call.
+    Only tools that actively want to set a highlight (currently only
+    `cminer_highlight_pattern`) need to pass it. Any other tool action
+    implicitly removes the highlight overlay.
+
+    See Focus Protocol in app/core/visualization.py for semantics.
+    """
+    focus = session.setdefault("focus", _empty_focus())
+    if tab is not _UNSET:
+        focus["tab"] = tab
+    if pattern_id is not _UNSET:
+        focus["pattern_id"] = pattern_id
+    if model_name is not _UNSET:
+        focus["model_name"] = model_name
+    focus["highlight"] = highlight
 
 
 def get_active_model_entry(session: dict) -> dict | None:

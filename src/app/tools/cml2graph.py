@@ -19,6 +19,7 @@ from app.core.state import (
     get_session,
     get_active_model_entry,
     get_active_plugin,
+    set_focus,
 )
 
 mcp = FastMCP("cml2graph")
@@ -108,6 +109,7 @@ async def cml2graph_load_model(
         session["active_model"] = key
         entry = session["models"][key]
         summary = summarize_graph(entry["current_graph"])
+        set_focus(session, tab="models", model_name=key, highlight=None)
         return (
             f"Model '{key}' is already loaded — now active.\n\n"
             f"{summary}\n\n"
@@ -126,6 +128,7 @@ async def cml2graph_load_model(
         "plugin_name": plugin_name,
     }
     session["active_model"] = key
+    set_focus(session, tab="models", model_name=key, highlight=None)
 
     summary = summarize_graph(graph)
     total = len(session["models"])
@@ -181,6 +184,7 @@ async def cml2graph_select_model(
     session["active_model"] = key
     entry = session["models"][key]
     summary = summarize_graph(entry["current_graph"])
+    set_focus(session, tab="models", model_name=key, highlight=None)
     return f"'{key}' is now the active model.\n\n{summary}"
 
 
@@ -199,6 +203,16 @@ async def cml2graph_remove_model(
     if session["active_model"] == key:
         session["active_model"] = next(iter(session["models"]), None)
 
+    # If the focused/highlighted model was the one removed, clear that focus.
+    focus = session.get("focus") or {}
+    fkw: dict = {"tab": "models"}
+    if focus.get("model_name") == key:
+        fkw["model_name"] = session["active_model"]
+    h = focus.get("highlight")
+    if h and h.get("model_name") == key:
+        fkw["highlight"] = None
+    set_focus(session, **fkw)
+
     remaining = len(session["models"])
     active = session["active_model"] or "(none)"
     result = f"Removed '{key}'. {remaining} model(s) remaining. Active: {active}"
@@ -213,6 +227,7 @@ async def cml2graph_clear_models(ctx: Context = None) -> str:
     session = get_session(ctx)
     session["models"].clear()
     session["active_model"] = None
+    set_focus(session, tab="models", model_name=None, highlight=None)
     result = "All models cleared from the list."
     if session.get("patterns"):
         result += "\nNote: call cminer_generate_visualization to update the visualization."
@@ -304,6 +319,7 @@ async def cml2graph_filter(
 
     entry["current_graph"] = result
     summary = summarize_graph(result)
+    set_focus(session, tab="models", model_name=session["active_model"], highlight=None)
     return (
         f"Filter '{filter_name}' applied to '{session['active_model']}'.\n\n{summary}\n"
         f"Note: call cminer_generate_visualization to update the visualization."
@@ -342,6 +358,7 @@ async def cml2graph_reset_model(
     entry = session["models"][key]
     entry["current_graph"] = copy.deepcopy(entry["original_graph"])
     summary = summarize_graph(entry["current_graph"])
+    set_focus(session, tab="models", model_name=key, highlight=None)
     return (
         f"Model '{key}' reset to original state.\n\n{summary}\n"
         f"Note: call cminer_generate_visualization to update the visualization."
@@ -456,7 +473,9 @@ async def cml2graph_load_dataset(
     # Set first loaded model as active if none is active
     if session.get("active_model") is None and session["models"]:
         session["active_model"] = next(iter(session["models"]))
-    
+
+    set_focus(session, tab="models", highlight=None)
+
     total = len(models_to_load)
     return (
         f"Dataset '{dataset_name}' ({dataset_data['info'].title}):\n"

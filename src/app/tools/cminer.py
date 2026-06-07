@@ -1,7 +1,9 @@
 import asyncio
 import contextlib
+import copy
 import io
 import os
+import shutil
 import tempfile
 from collections import Counter
 from pathlib import Path
@@ -26,11 +28,13 @@ from app.core.state import (
     plugin_manager as _plugin_manager,
     get_session,
     session_store,
+    set_focus,
 )
 from app.utils.cminer_patterns_helper import (
     PatternInfo,
     parse_cminer_output,
     pattern_to_tve_gdata,
+    resolve_occurrence_highlights,
 )
 from app.utils.plantuml_helper import plantuml_encode
 
@@ -40,7 +44,7 @@ logger = setup_logging("DEBUG", __name__)
 @lifespan
 async def _cminer_lifespan(server):
     cminer = CMinerAPI(
-        db_file="datasets/Datasets/test/test.data",
+        db_file=None,
         support=1,
         max_nodes=10,
         string_output=True,
@@ -148,6 +152,9 @@ async def cminer_mine_patterns(
     tmp_files: list[str] = []
     nlf = NodeLinkFormat()
 
+    # check if db file is set
+    if not models and not cminer.db_file:
+        return "Error: No models loaded and no db_file configured for CMiner. Load one or more models before mining."
     # Reset CMiner state for a fresh run
     cminer.db = []
     from CMiner.CMinerAPI import DFSStack
@@ -159,23 +166,34 @@ async def cminer_mine_patterns(
 
     if models:
         # Batch mode: export each model's current_graph to a temp file,
-        # then load them all into CMiner's db
+        # then load them all into CMiner's db.
+        # Use the model name as the filename so CMiner's mapping output
+        # contains human-readable names instead of random temp strings.
+        tmp_dir = tempfile.mkdtemp(prefix="cminer_batch_")
         for name, entry in models.items():
             graph = entry["current_graph"]
             json_text = nlf.render(graph)
-            tmp = tempfile.NamedTemporaryFile(
-                mode="w", suffix=".json", delete=False, encoding="utf-8"
+            safe_name = "".join(
+                c if c.isalnum() or c in ("_", "-") else "_" for c in name
             )
-            tmp.write(json_text)
-            tmp.close()
-            tmp_files.append(tmp.name)
+            tmp_path = os.path.join(tmp_dir, f"{safe_name}.json")
+            # Handle rare collision after sanitization
+            counter = 1
+            original_safe = safe_name
+            while os.path.exists(tmp_path):
+                safe_name = f"{original_safe}_{counter}"
+                tmp_path = os.path.join(tmp_dir, f"{safe_name}.json")
+                counter += 1
+            with open(tmp_path, "w", encoding="utf-8") as f:
+                f.write(json_text)
+            tmp_files.append(tmp_path)
             logger.debug(
                 f"Session {session_id}: model '{name}' — "
                 f"{graph.number_of_nodes()} nodes, "
-                f"{graph.number_of_edges()} edges → {tmp.name}"
+                f"{graph.number_of_edges()} edges -> {tmp_path}"
             )
             # Load this file into CMiner's db (accumulate)
-            cminer.set_db_file(tmp.name)
+            cminer.set_db_file(tmp_path)
             cminer._read_graphs_from_file()
 
         await ctx.info(
@@ -210,6 +228,8 @@ async def cminer_mine_patterns(
             cminer.min_support = original_support
             for f in tmp_files:
                 os.unlink(f)
+            if 'tmp_dir' in locals():
+                shutil.rmtree(tmp_dir, ignore_errors=True)
 
         # Collect output from the StringSolutionSaver
         raw = cminer.stack.solution_saver.get_results() if hasattr(cminer.stack.solution_saver, 'get_results') else ""
@@ -237,11 +257,24 @@ async def cminer_mine_patterns(
 
     logger.debug(f"Raw CMiner output (first 1000 chars):\n{output_text[:1000]}")
 
-    patterns = parse_cminer_output(output_text)
+    # If show_mappings is enabled we take the structured pattern info
+    if cminer.show_mappings:
+        structured = cminer.get_structured_patterns()
+        for idx, p in enumerate(structured, start=1):
+            p["id"] = idx
+        patterns = structured
+        logger.debug(f"Using structured pattern data: {len(patterns)} patterns")
+    else:
+        patterns = parse_cminer_output(output_text)
+        patterns = [p.__dict__ for p in patterns]
+        logger.debug(f"Fallback to string parsing: {len(patterns)} patterns")
 
-    session["patterns"] = [p.__dict__ for p in patterns]
+    session["patterns"] = patterns
     session["viz_data"] = None
 
+    # Focus the viewer on the patterns tab next time it opens (first pattern
+    # is auto-selected by the viewer when pattern_id is not set).
+    set_focus(session, tab="patterns", pattern_id=None, highlight=None)
 
     # Auto-save TODO: make this async and non-blocking
     try:
@@ -400,15 +433,34 @@ async def cminer_get_pattern_info(
     patterns = session.get("patterns", [])
     for p in patterns:
         if p["id"] == pattern_id:
+            # Focus viewer on this pattern next time it opens
+            set_focus(session, tab="patterns", pattern_id=pattern_id)
             node_lines = [f"  v {nid} {' '.join(lbl)}" for nid, lbl in p["nodes"]]
             edge_lines = [f"  e {src} {dst} {lbl}" for src, dst, lbl in p["edges"]]
-            return (
-                f"Pattern #{p['id']}\n"
-                f"  Support   : {p['support']}\n"
-                f"  Frequency : {p['frequency']}\n"
-                f"  Nodes ({len(p['nodes'])}):\n" + ("\n".join(node_lines) or "    (none)") + "\n"
-                f"  Edges ({len(p['edges'])}):\n" + ("\n".join(edge_lines) or "    (none)")
-            )
+            lines = [
+                f"Pattern #{p['id']}",
+                f"  Support   : {p['support']}",
+                f"  Frequency : {p['frequency']}",
+                f"  Nodes ({len(p['nodes'])}):",
+                "\n".join(node_lines) or "    (none)",
+                f"  Edges ({len(p['edges'])}):",
+                "\n".join(edge_lines) or "    (none)",
+            ]
+            mappings = p.get("mappings")
+            if mappings:
+                lines.append("  Mappings:")
+                if isinstance(mappings, dict):
+                    for graph_name, occurrences in mappings.items():
+                        lines.append(f"    {graph_name}: {len(occurrences)} occurrence(s)")
+                        for occ_idx, occ in enumerate(occurrences, 1):
+                            node_map = occ.get("nodes", {})
+                            edge_list = occ.get("edges", [])
+                            lines.append(f"      Occurrence {occ_idx}:")
+                            lines.append(f"        Nodes: {node_map}")
+                            lines.append(f"        Edges: {edge_list}")
+                else:
+                    lines.append("    " + str(mappings).replace("\n", "\n    "))
+            return "\n".join(lines)
 
     available_ids = sorted(p["id"] for p in patterns)
     return (
@@ -416,6 +468,158 @@ async def cminer_get_pattern_info(
         f"Available pattern IDs: {available_ids[:50]}"
         + ("  …" if len(available_ids) > 50 else "")
     )
+
+
+@mcp.tool()
+async def cminer_highlight_pattern(
+    pattern_id: Annotated[int, "The numeric ID of the pattern to highlight."],
+    model_name: Annotated[str, "Name of the loaded model to highlight the pattern in."],
+    occurrence_index: Annotated[int | None, "0-based index of a specific occurrence to highlight. If omitted, all occurrences are highlighted."] = None,
+    ctx: Context = None,
+) -> str:
+    """
+    Highlight occurrences of a mined pattern inside a specific loaded model.
+    Returns the IDs of highlighted nodes/edges and an encoded PlantUML image.
+    """
+    if not ctx or not ctx.session_id:
+        return "Error: No session ID in MCP context."
+
+    session = get_session(ctx)
+    patterns = session.get("patterns", [])
+    models = session.get("models", {})
+
+    # Find the pattern
+    pattern = None
+    for p in patterns:
+        if p["id"] == pattern_id:
+            pattern = p
+            break
+    if pattern is None:
+        available = sorted(pp["id"] for pp in patterns)
+        return f"Pattern #{pattern_id} not found. Available: {available[:50]}"
+
+    # Find the model
+    if model_name not in models:
+        available_models = ", ".join(models.keys()) or "(none)"
+        return f"Model '{model_name}' not found. Loaded: {available_models}"
+
+    entry = models[model_name]
+    graph = copy.deepcopy(entry["current_graph"])
+    plugin_name = entry.get("plugin_name", "ontouml")
+    plugin = (
+        _plugin_manager.get(plugin_name)
+        if plugin_name in _plugin_manager.available
+        else _plugin_manager.get("ontouml")
+    )
+
+    # Get structured mappings
+    mappings = pattern.get("mappings")
+    if not mappings or not isinstance(mappings, dict):
+        return (
+            f"Pattern #{pattern_id} has no structured mappings. "
+            f"Re-run mining with the patched CMiner to get mapping data."
+        )
+
+    # Find occurrences for this model.
+    # Model names in mappings have the .json suffix stripped by CMiner.
+    # We need to match against the sanitized name used during mining.
+    target_graph_name = model_name
+    occurrences = None
+    for graph_name, occs in mappings.items():
+        # CMiner uses the filename without extension as graph name
+        if graph_name == target_graph_name or graph_name == target_graph_name.replace(".json", ""):
+            occurrences = occs
+            break
+
+    if occurrences is None:
+        # Try with sanitized name (same logic as mining)
+        safe_name = "".join(
+            c if c.isalnum() or c in ("_", "-") else "_" for c in model_name
+        )
+        for graph_name, occs in mappings.items():
+            if graph_name == safe_name:
+                occurrences = occs
+                break
+
+    if not occurrences:
+        return f"Pattern #{pattern_id} was not found in model '{model_name}'."
+
+    # Select occurrence(s)
+    if occurrence_index is not None:
+        if occurrence_index < 0 or occurrence_index >= len(occurrences):
+            return (
+                f"Occurrence {occurrence_index} out of range. "
+                f"Model '{model_name}' has {len(occurrences)} occurrence(s)."
+            )
+        occurrences = [occurrences[occurrence_index]]
+
+    # Collect highlighted nodes/edges from occurrences.
+    # CMiner uses integer edge keys internally; current_graph has UUID keys.
+    # resolve_occurrence_highlights handles that mismatch.
+    highlighted_nodes, highlighted_edges = resolve_occurrence_highlights(occurrences, graph)
+
+    # Apply highlight attributes to the graph copy
+    for node in graph.nodes():
+        if node in highlighted_nodes:
+            graph.nodes[node]["highlight"] = True
+            graph.nodes[node]["highlight_line_color"] = "#E84A4A"
+    for src, dst, key in graph.edges(keys=True):
+        if (src, dst, key) in highlighted_edges:
+            graph.edges[src, dst, key]["highlight"] = True
+            graph.edges[src, dst, key]["highlight_line_color"] = "#E84A4A"
+
+    # Render highlighted graph
+    try:
+        plantuml_text = plugin.render(graph, "plantuml")
+        print(f"Rendered highlighted model: {plantuml_text}")
+        encoded = plantuml_encode(plantuml_text)
+    except Exception as e:
+        logger.warning(f"Could not render highlighted model: {e}")
+        return f"Error rendering highlighted model: {e}"
+
+    # Store in session
+    if "highlights" not in session:
+        session["highlights"] = {}
+    session["highlights"][f"{pattern_id}_{model_name}"] = {
+        "pattern_id": pattern_id,
+        "model_name": model_name,
+        "occurrence_index": occurrence_index,
+        "highlighted_nodes": list(highlighted_nodes),
+        "highlighted_edges": [
+            {"src": s, "dst": d, "key": k} for s, d, k in highlighted_edges
+        ],
+        "encoded": encoded,
+    }
+
+    # Focus the viewer: models tab with the highlight applied. Also set
+    # pattern_id so that if the user manually switches to the patterns tab,
+    # the highlighted pattern is already selected there too.
+    set_focus(
+        session,
+        tab="models",
+        pattern_id=pattern_id,
+        model_name=model_name,
+        highlight={
+            "pattern_id": pattern_id,
+            "model_name": model_name,
+            "occurrence_index": occurrence_index,
+        },
+    )
+
+    node_list = ", ".join(str(n) for n in sorted(highlighted_nodes))
+    edge_list = ", ".join(f"({s},{d},{k})" for s, d, k in sorted(highlighted_edges))
+    occ_desc = (
+        f"occurrence {occurrence_index}"
+        if occurrence_index is not None
+        else f"all {len(occurrences)} occurrence(s)"
+    )
+
+    return (
+        f"Highlighted pattern #{pattern_id} in '{model_name}' ({occ_desc}).\n"
+        f"  Nodes: {node_list}\n"
+        f"  Edges: {edge_list}\n"
+    )
+
 
 @mcp.tool()
 async def cminer_filter_patterns(
@@ -456,6 +660,9 @@ async def cminer_filter_patterns(
 
     if not matched:
         return "No patterns match the given filters."
+
+    # Focus viewer on the patterns tab, selecting the first match
+    set_focus(session, tab="patterns", pattern_id=matched[0]["id"], highlight=None)
 
     lines = [f"Found {len(matched)} matching pattern(s):"]
     for p in matched[:100]:

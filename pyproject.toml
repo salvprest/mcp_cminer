@@ -27,5 +27,5 @@ build-backend = "hatchling.build"
 packages = ["src/app"]
 
 [tool.uv.sources]
-cminer = { git = "https://github.com/salvprest/CMiner.git" }
+cminer = { git = "https://github.com/SimoneAvellino/CMiner.git", branch = "cminer-ai" }
 cml2graph = { git = "https://github.com/salvprest/cml2graph.git" }
