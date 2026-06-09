@@ -382,11 +382,16 @@ async function onPatternClick(localIdx, globalIdx) {
  * list. If `targetModelName` is given, select that model; otherwise if
  * `pickFirstModel` is true, select the first matched model. Returns whether
  * anything was matched.
+ *
+ * occurrenceIndex: when non-null, only that occurrence is highlighted;
+ * null means all occurrences (used for the interactive double-click gesture).
  */
-async function activatePatternHighlight(patternId, pickFirstModel = false, targetModelName = null) {
+async function activatePatternHighlight(patternId, pickFirstModel = false, targetModelName = null, occurrenceIndex = null) {
   let matchedModels = [];
   try {
-    const resp = await fetch(`${API}/api/sessions/${SID}/patterns/${patternId}/models`);
+    let url = `${API}/api/sessions/${SID}/patterns/${patternId}/models`;
+    if (occurrenceIndex !== null) url += `?occurrence_index=${occurrenceIndex}`;
+    const resp = await fetch(url);
     if (resp.ok) {
       const data = await resp.json();
       matchedModels = data.models || [];
@@ -589,8 +594,8 @@ async function applyFocus(focus) {
   if (tab === 'models' && !hasMods) tab = 'patterns';
   if (tab === 'patterns' && !hasPats) tab = 'models';
 
-  // 1. Pre-select a pattern (quietly if patterns won't be the visible tab —
-  //    user requested that the selection persist across tabs even if hidden)
+  // Pre-select a pattern (quietly if patterns won't be the visible tab
+  // user requested that the selection persist across tabs even if hidden)
   if (hasPats) {
     const targetPid = f.pattern_id ?? (f.highlight && f.highlight.pattern_id);
     if (targetPid != null) {
@@ -607,7 +612,7 @@ async function applyFocus(focus) {
     }
   }
 
-  // 2. Handle highlight (overrides plain model selection)
+  // Handle highlight (overrides plain model selection)
   let modelHandled = false;
   if (f.highlight && hasMods) {
     const h = f.highlight;
@@ -615,11 +620,12 @@ async function applyFocus(focus) {
       h.pattern_id,
       /*pickFirstModel*/ false,
       /*targetModelName*/ h.model_name || null,
+      /*occurrenceIndex*/ h.occurrence_index ?? null,
     );
     modelHandled = ok;
   }
 
-  // 3. Plain model selection (when no highlight handled it)
+  // Plain model selection (when no highlight handled it)
   if (!modelHandled && hasMods) {
     let idx = -1;
     if (f.model_name) {
@@ -629,7 +635,7 @@ async function applyFocus(focus) {
     showModel(idx);
   }
 
-  // 4. Switch to the chosen tab last so its render uses the final state
+  // Switch to the chosen tab last so its render uses the final state
   switchTab(tab);
 }
 

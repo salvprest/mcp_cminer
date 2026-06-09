@@ -271,6 +271,9 @@ async def cminer_mine_patterns(
 
     session["patterns"] = patterns
     session["viz_data"] = None
+    # Invalidate highlight cache, old renders reference pattern occurrences
+    # from the previous mining run and are no longer valid.
+    session["highlights"] = {}
 
     # Focus the viewer on the patterns tab next time it opens (first pattern
     # is auto-selected by the viewer when pattern_id is not set).
@@ -577,10 +580,12 @@ async def cminer_highlight_pattern(
         logger.warning(f"Could not render highlighted model: {e}")
         return f"Error rendering highlighted model: {e}"
 
-    # Store in session
+    # Store in session — key includes occurrence_index so all-occurrences and
+    # per-occurrence renders are cached independently and never overwrite each other.
     if "highlights" not in session:
         session["highlights"] = {}
-    session["highlights"][f"{pattern_id}_{model_name}"] = {
+    cache_key = f"{pattern_id}_{model_name}_{occurrence_index}"
+    session["highlights"][cache_key] = {
         "pattern_id": pattern_id,
         "model_name": model_name,
         "occurrence_index": occurrence_index,
@@ -618,6 +623,7 @@ async def cminer_highlight_pattern(
         f"Highlighted pattern #{pattern_id} in '{model_name}' ({occ_desc}).\n"
         f"  Nodes: {node_list}\n"
         f"  Edges: {edge_list}\n"
+        f"Note: reload the visualization to see the updated highlight."
     )
 
 

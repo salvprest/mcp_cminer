@@ -274,10 +274,17 @@ async def session_models(session_id: str):
 
 
 @app.get("/api/sessions/{session_id}/patterns/{pattern_id}/models")
-async def pattern_matched_models(session_id: str, pattern_id: int):
+async def pattern_matched_models(
+    session_id: str,
+    pattern_id: int,
+    occurrence_index: int | None = Query(None, ge=0),
+):
     """
     Return models that contain a specific pattern, with highlighted PlantUML encodings.
-    Results are cached in session['highlights'] after the first request.
+    When occurrence_index is provided, only that occurrence is highlighted; otherwise
+    all occurrences are highlighted together.
+    Results are cached in session['highlights'] keyed by (pattern_id, model_name,
+    occurrence_index) so all-occurrences and per-occurrence renders never collide.
     """
     import copy
     from app.utils.plantuml_helper import plantuml_encode
@@ -316,7 +323,17 @@ async def pattern_matched_models(session_id: str, pattern_id: int):
         if not occurrences:
             continue
 
-        cache_key  = f"{pattern_id}_{model_name}"
+        # Filter to the requested occurrence when specified
+        effective_occurrences = occurrences
+        if occurrence_index is not None:
+            if occurrence_index >= len(occurrences):
+                # Requested occurrence doesn't exist for this model, skip it
+                continue
+            effective_occurrences = [occurrences[occurrence_index]]
+
+        # Cache key includes occurrence_index so renders with different scopes
+        # are stored independently and never overwrite each other.
+        cache_key  = f"{pattern_id}_{model_name}_{occurrence_index}"
         highlights = session.setdefault("highlights", {})
 
         if cache_key in highlights:
@@ -332,7 +349,7 @@ async def pattern_matched_models(session_id: str, pattern_id: int):
                     else _plugin_manager.get("ontouml")
                 )
 
-                highlighted_nodes, highlighted_edges = resolve_occurrence_highlights(occurrences, graph)
+                highlighted_nodes, highlighted_edges = resolve_occurrence_highlights(effective_occurrences, graph)
 
                 for node in graph.nodes():
                     if node in highlighted_nodes:

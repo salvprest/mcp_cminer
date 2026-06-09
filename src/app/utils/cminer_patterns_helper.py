@@ -76,11 +76,22 @@ def resolve_occurrence_highlights(
     """
     Derive the sets of highlighted nodes and edges from CMiner occurrence mappings.
 
-    CMiner's internal DBGraph rekeys edges as integers (0, 1, …) when loading
-    JSON via networkx's node_link_graph, whereas the session's current_graph
-    retains the original UUID string edge keys.  We therefore match occurrences
-    by (src, dst) node-ID pairs and resolve them to the actual edge keys that
-    exist in the graph.
+    CMiner's internal DBGraph reinitialises the graph from the JSON export
+    and in doing so re-indexes all edge keys as integers 0, 1, 2, ... (in JSON
+    order), even though the session's current_graph retains the original UUID
+    string edge keys.  The two graphs are loaded from the *same* JSON payload
+    in the *same* order, so the ordering of edges between any (src, dst) pair
+    is identical in both.  We exploit this to map
+
+        CMiner integer key n  ->  list(graph[src][dst].keys())[n]
+
+    i.e. the n-th UUID key in insertion order.  This ensures that when a
+    pattern occurrence references one specific parallel edge (key=1 of three),
+    only that one edge is highlighted rather than all three.
+
+    Falls back to highlighting all edges between (src, dst) when:
+      - the key is absent or None (legacy / fallback data), or
+      - the key is out of range (e.g. graph was filtered after mining).
 
     Returns:
         (highlighted_nodes, highlighted_edges)
@@ -88,20 +99,28 @@ def resolve_occurrence_highlights(
         highlighted_edges : set of (src, dst, key) triples using the graph's own keys
     """
     highlighted_nodes: set = set()
-    highlighted_edge_pairs: set = set()  # (src, dst) from CMiner mappings
+    highlighted_edges: set = set()
 
     for occ in occurrences:
         for target_node in occ.get("nodes", {}).values():
             highlighted_nodes.add(target_node)
         for edge in occ.get("edges", []):
-            highlighted_edge_pairs.add((edge["src"], edge["dst"]))
-
-    # Resolve (src, dst) pairs → actual (src, dst, key) triples in the graph
-    highlighted_edges: set = set()
-    for src, dst in highlighted_edge_pairs:
-        if graph.has_edge(src, dst):
-            for key in graph[src][dst]:
-                highlighted_edges.add((src, dst, key))
+            src = edge["src"]
+            dst = edge["dst"]
+            raw_key = edge.get("key")
+            if not graph.has_edge(src, dst):
+                continue
+            edge_keys = list(graph[src][dst].keys())
+            if isinstance(raw_key, int) and 0 <= raw_key < len(edge_keys):
+                # CMiner integer key is a 0-based position index.
+                highlighted_edges.add((src, dst, edge_keys[raw_key]))
+            elif raw_key is not None and raw_key in graph[src][dst]:
+                # Key is already a valid UUID/string key (defensive path).
+                highlighted_edges.add((src, dst, raw_key))
+            else:
+                # No usable key, fall back to all parallel edges.
+                for k in edge_keys:
+                    highlighted_edges.add((src, dst, k))
 
     return highlighted_nodes, highlighted_edges
 
