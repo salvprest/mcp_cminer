@@ -42,7 +42,9 @@ class SessionStore:
             "saved_at": datetime.now().isoformat(),
             "num_models": len(session_data.get("models", {})),
             "num_patterns": len(session_data.get("patterns", [])),
+            "mine_parameters": session_data.get("mine_parameters", {}),
             "active_model": session_data.get("active_model"),
+            "filters_history": session_data.get("filters_history", []),
         }
 
         with open(session_dir / "metadata.json", "w") as f:
@@ -64,6 +66,29 @@ class SessionStore:
             json.dump(models_data, f, indent=2)
         with open(session_dir / "patterns.json", "w") as f:
             json.dump(session_data.get("patterns", []), f, indent=2)
+
+        return str(session_dir)
+
+    def additional_save_session(
+        self,
+        client_id: str,
+        session_id: str,
+        session_data: Dict,
+        name: Optional[str] = None,
+        description: Optional[str] = None,
+    ) -> str:
+        """Save a session with all its data (excluding HTML)."""
+        client_dir = self._get_client_dir(client_id)
+        session_dir = client_dir / session_id
+        session_dir.mkdir(parents=True, exist_ok=True)
+
+        # Metadata
+        metadata = {
+            "patterns_filters_history": session_data.get("patterns_filters_history", []),
+        }
+
+        with open(session_dir / "patterns_filters_history.json", "w") as f:
+            json.dump(metadata, f, indent=2)
 
         return str(session_dir)
 

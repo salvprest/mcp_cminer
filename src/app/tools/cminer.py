@@ -270,6 +270,11 @@ async def cminer_mine_patterns(
         logger.debug(f"Fallback to string parsing: {len(patterns)} patterns")
 
     session["patterns"] = patterns
+    session["mine_parameters"] = {
+        "min_support": cminer.min_support,
+        "min_nodes": cminer.stack.min_nodes,
+        "max_nodes": cminer.stack.max_nodes,
+    }
     session["viz_data"] = None
     # Invalidate highlight cache, old renders reference pattern occurrences
     # from the previous mining run and are no longer valid.
@@ -651,8 +656,19 @@ async def cminer_filter_patterns(
         return "Error: No patterns in this session. Run cminer_run first."
 
     patterns = session.get("patterns", [])
+    # use a copy of the patterns without mappings
+    clean_patterns = [
+        {
+            "id": p["id"],
+            "nodes": p["nodes"],
+            "edges": p["edges"],
+            "support": p["support"],
+            "frequency": p["frequency"],
+        }
+        for p in patterns
+    ]
     matched  = []
-    for p in patterns:
+    for p in clean_patterns:
         n_nodes = len(p["nodes"])
         n_edges = len(p["edges"])
         if min_frequency is not None and p["frequency"] < min_frequency: continue
@@ -666,6 +682,33 @@ async def cminer_filter_patterns(
 
     if not matched:
         return "No patterns match the given filters."
+
+    # Save in the session the last filter criteria and results.
+    session["patterns_filters_history"] = session.get("patterns_filters_history", [])
+    session["patterns_filters_history"].append({
+        "criteria": {
+            "min_frequency": min_frequency,
+            "max_frequency": max_frequency,
+            "min_edges": min_edges,
+            "max_edges": max_edges,
+            "min_nodes": min_nodes,
+            "max_nodes": max_nodes,
+            "min_support": min_support,
+        },
+        "results": matched,
+    })
+
+    try:
+        session_store.additional_save_session(
+            client_id=get_access_token().client_id or "anonymous",
+            session_id=ctx.session_id,
+            session_data=session,
+            name=f"Filter patterns {datetime.now().strftime('%Y-%m-%d %H:%M')}",
+            description=f"Filtered patterns criteria"
+        )
+        logger.info(f"Session {ctx.session_id} filter criteria auto-saved")
+    except Exception as e:
+        logger.warning(f"Could not auto-save session after filtering patterns: {e}")
 
     # Focus viewer on the patterns tab, selecting the first match
     set_focus(session, tab="patterns", pattern_id=matched[0]["id"], highlight=None)

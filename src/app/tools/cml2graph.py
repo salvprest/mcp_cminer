@@ -318,6 +318,7 @@ async def cml2graph_filter(
         return f"Filter failed: {e}"
 
     entry["current_graph"] = result
+    session["filters_history"] = session.get("filters_history", []) + [{filter_name: args}]
     summary = summarize_graph(result)
     set_focus(session, tab="models", model_name=session["active_model"], highlight=None)
     return (

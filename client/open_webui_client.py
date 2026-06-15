@@ -760,6 +760,8 @@ class Pipe:
                 - Loading a saved session.
 
                 Rules:
+                - Load all the models files passed to you, unless the user specifies the models that want to load.
+                - Filter all the models files if the user do not specify the model to filter.
                 - ALWAYS execute the tools needed to answer the user's query.
                 - Do NOT fake the tools execution.
                 - Do NOT include internal resource URIs (cminer://) in your responses.
