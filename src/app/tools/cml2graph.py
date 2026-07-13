@@ -350,7 +350,7 @@ async def cml2graph_reset_model(
     file_name: Annotated[str | None, "Name of a model to reset. If omitted, resets the active model."] = None,
     ctx: Context = None,
 ) -> str:
-    """Use this to reset a model to its original state, undoing all applied filters."""
+    """Use this to reset a model to its original state, unfiltered state, undoing all applied filters."""
     session = get_session(ctx)
     key = Path(file_name).name if file_name else session.get("active_model")
     if key is None or key not in session["models"]:

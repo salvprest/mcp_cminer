@@ -8,7 +8,10 @@ wheels/
 
 # App files to ignore
 uploads/
+data/
 saved_sessions/
+datasets/eamodelset*
 
 # Virtual environments
 .venv
+.kilo

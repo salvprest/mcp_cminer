@@ -507,8 +507,14 @@ document.addEventListener('mouseup', () => {
   vp.addEventListener('wheel', e => {
     e.preventDefault();
     const r = vp.getBoundingClientRect();
-    zoomAt(panel, e.deltaY < 0 ? 1.12 : 1/1.12,
-           e.clientX - r.left, e.clientY - r.top);
+    // Normalize the zoom factor based on the magnitude of the scroll.
+    // 0.0015 is the intensity multiplier. Adjust this up or down to 
+    // change the overall zoom speed.
+    let factor = Math.exp(-e.deltaY * 0.0015);
+    // Cap the factor so standard PC mouse wheels don't jump too fast in one tick
+    factor = Math.min(Math.max(factor, 0.8), 1.25);
+
+    zoomAt(panel, factor, e.clientX - r.left, e.clientY - r.top);
   }, { passive: false });
 
   let dragging = false, mx = 0, my = 0;

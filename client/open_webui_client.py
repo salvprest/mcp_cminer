@@ -119,7 +119,9 @@ def _strip_internal_uris(text: str) -> str:
 def _truncate_message(msg: Dict, max_chars: int) -> Dict:
     """Return msg with content truncated to max_chars (strings only)."""
     content = msg.get("content")
-    if not isinstance(content, str) or len(content) <= max_chars:
+    if not isinstance(content, str):
+        return msg
+    if len(content) <= max_chars:
         return msg
     truncated = content[:max_chars] + "\n…[truncated — content too large for context]"
     return {**msg, "content": truncated}
@@ -169,7 +171,7 @@ class SessionContainer:
     resources: List[Dict] = field(default_factory=list)
     resource_templates: List[Dict] = field(default_factory=list)
     prompts: List[Dict] = field(default_factory=list)
-    uploaded_files: Dict[str, str] = None
+    uploaded_files: Dict[str, Tuple[str, str]] = None
 
 
 # ---------------------------------------------------------------------------
@@ -414,19 +416,22 @@ class MCPClientManager:
     def list_all_prompts(self) -> List[Dict]:
         return [p for s in self.sessions.values() for p in s.prompts]
 
-    def list_all_uploaded_files(self) -> Dict[str, str]:
+    def list_all_uploaded_files(self) -> Dict[str, Tuple[str, str]]:
+        """File hash -> (file_name, remote_path) mapping cache."""
         files = {}
         for s in self.sessions.values():
             if s.uploaded_files:
                 files.update(s.uploaded_files)
         return files
 
-    def register_uploaded_file(self, file_hash: str, file_name: str) -> None:
-        """File hash -> name mapping cache."""
+    def register_uploaded_file(
+        self, file_hash: str, file_name: str, remote_path: str
+    ) -> None:
+        """Cache file hash -> (name, remote_path) for the active session."""
         for s in self.sessions.values():
             if s.uploaded_files is None:
                 s.uploaded_files = {}
-            s.uploaded_files[file_hash] = file_name
+            s.uploaded_files[file_hash] = (file_name, remote_path)
             return
 
     async def cleanup(self) -> None:
@@ -762,6 +767,7 @@ class Pipe:
                 Rules:
                 - Load all the models files passed to you, unless the user specifies the models that want to load.
                 - Filter all the models files if the user do not specify the model to filter.
+                - ALWAYS list all available filters before applying any filter.
                 - ALWAYS execute the tools needed to answer the user's query.
                 - Do NOT fake the tools execution.
                 - Do NOT include internal resource URIs (cminer://) in your responses.
@@ -893,21 +899,25 @@ class Pipe:
                 try:
                     # Calculate the unique content hash
                     file_hash = _get_file_hash(path)
-                    # Get file hashes map controll if the same content was already uploaded
+                    # Check whether the same content was already uploaded in this chat
                     uploaded_files = mcp_manager.list_all_uploaded_files()
                     if file_hash and file_hash in uploaded_files:
-                        original_file_name = uploaded_files[file_hash]
-                        logger.debug(f"Skipping '{fname}': identical content already uploaded as '{original_file_name}'.")
-                        # If they uploaded the same file under a different name, tell the LLM
-                        if fname != original_file_name:
-                            results.append(
-                                {
-                                    "name": fname,
-                                    "remote_path": None,
-                                    "status": "skipped",
-                                    "detail": f"File with identical content already uploaded as '{original_file_name}'. Treat them as the same file.",
-                                }
-                            )
+                        original_file_name, cached_remote = uploaded_files[file_hash]
+                        logger.debug(
+                            f"Skipping '{fname}': identical content already uploaded as "
+                            f"'{original_file_name}' -> {cached_remote}."
+                        )
+                        results.append(
+                            {
+                                "name": fname,
+                                "remote_path": cached_remote,
+                                "status": "skipped",
+                                "detail": (
+                                    f"File with identical content already uploaded as "
+                                    f"'{original_file_name}' ({cached_remote}). Treat them as the same file."
+                                ),
+                            }
+                        )
                         continue
                     logger.debug(f"Uploading '{fname}' to MCP server (hash: {file_hash})")
                     await self._emit(emitter, "info", f"Uploading {fname}…", False)
@@ -926,7 +936,7 @@ class Pipe:
                                     f"Uploaded {fname} → {remote}",
                                     False,
                                 )
-                                mcp_manager.register_uploaded_file(file_hash, fname)
+                                mcp_manager.register_uploaded_file(file_hash, fname, remote)
                                 results.append(
                                     {
                                         "name": fname,
@@ -1110,7 +1120,9 @@ class Pipe:
         __files__: list = None,
     ) -> str:
         messages = body.get("messages", [])
-        if not messages:
+        # Open WebUI may send an empty message list when the user attaches
+        # files but types no text. We still want to process those files.
+        if not messages and not __files__:
             yield ""
             return
 
@@ -1166,7 +1178,13 @@ class Pipe:
             uploaded_files: List[Dict] = []
             if __files__:
                 uploaded_files = await self._push_files_to_remote(__files__, __event_emitter__, chat_id)
-            ok_uploads = [f for f in uploaded_files if f["status"] == "ok"]
+            # Files that are available on the MCP server: newly uploaded ones
+            # plus duplicates whose content was already uploaded in this chat.
+            ok_uploads = [
+                f
+                for f in uploaded_files
+                if f["status"] in ("ok", "skipped") and f.get("remote_path")
+            ]
             for f in uploaded_files:
                 if f["status"] == "error":
                     logger.warning(f"File upload failed: {f['name']} — {f['detail']}")
