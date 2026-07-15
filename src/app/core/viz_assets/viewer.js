@@ -89,6 +89,17 @@ function zoomStep(panel, factor) {
   zoomAt(panel, factor, e.vp.clientWidth / 2, e.vp.clientHeight / 2);
 }
 
+/* Click originated on a zoom button or the zoom-control toolbar —
+   ignore it in the viewport drag/dblclick/pinch handlers so rapid clicks
+   on +/- don’t trigger a reset or an unintended pan. */
+function isZoomControl(el) {
+  return el && (
+    el.classList?.contains('zoom-btn') ||
+    el.classList?.contains('zoom-controls') ||
+    el.closest?.('.zoom-controls')
+  );
+}
+
 /* ────────── SVG loading ────────── */
 function loadSvg(panel, svgContent) {
   const e = els(panel);
@@ -502,16 +513,26 @@ document.addEventListener('mouseup', () => {
   const vp = document.getElementById('vp-' + panel);
   if (!vp) return;
 
-  vp.addEventListener('dblclick', () => { resetZoom(panel); });
+  vp.addEventListener('dblclick', e => {
+    if (isZoomControl(e.target)) return;
+    resetZoom(panel);
+  });
 
   vp.addEventListener('wheel', e => {
     e.preventDefault();
     const r = vp.getBoundingClientRect();
-    // Normalize the zoom factor based on the magnitude of the scroll.
-    // 0.0015 is the intensity multiplier. Adjust this up or down to 
-    // change the overall zoom speed.
-    let factor = Math.exp(-e.deltaY * 0.0015);
-    // Cap the factor so standard PC mouse wheels don't jump too fast in one tick
+
+    // Normalize wheel delta units: Firefox reports line-mode by default,
+    // and some devices report page-mode. Convert both to pixel-like units.
+    let dy = e.deltaY;
+    if (e.deltaMode === 1)      dy *= 33;   // line units
+    else if (e.deltaMode === 2) dy *= 800;  // page units (fallback)
+
+    // Trackpad pinch gestures (Chrome/Edge) set ctrlKey and need higher
+    // sensitivity because their deltas are much smaller.
+    const intensity = e.ctrlKey ? 0.01 : 0.0015;
+    let factor = Math.exp(-dy * intensity);
+    // Cap the factor so a single wheel tick doesn't jump too far.
     factor = Math.min(Math.max(factor, 0.8), 1.25);
 
     zoomAt(panel, factor, e.clientX - r.left, e.clientY - r.top);
@@ -520,6 +541,7 @@ document.addEventListener('mouseup', () => {
   let dragging = false, mx = 0, my = 0;
   vp.addEventListener('mousedown', e => {
     if (e.button !== 0) return;
+    if (isZoomControl(e.target)) return;
     e.preventDefault();
     dragging = true;
     mx = e.clientX; my = e.clientY;
@@ -537,6 +559,7 @@ document.addEventListener('mouseup', () => {
 
   let touches = [], lastDist = 0;
   vp.addEventListener('touchstart', e => {
+    if (isZoomControl(e.target)) return;
     e.preventDefault();
     touches = Array.from(e.touches);
     if (touches.length === 2)
