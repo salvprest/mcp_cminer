@@ -1400,7 +1400,7 @@ class Pipe:
                 "cml2graph_remove_model",
                 "cml2graph_clear_models",
                 "cml2graph_filter",
-                "cml2graph_reset_model",
+                "cml2graph_reset_filters_models",
                 "cml2graph_load_dataset",
                 "session_load",
             }

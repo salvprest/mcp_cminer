@@ -6,7 +6,7 @@ from pathlib import Path
 
 from typing import Annotated
 from fastmcp import FastMCP, Context
-from cml2graph.core.prompts import summarize_graph
+from cml2graph.core.prompts import summarize_graph_stat, summarize_graph_stat_string
 from cml2graph.core.formats.node_link_fmt import NodeLinkFormat
 from app.utils.logger import setup_logging
 
@@ -92,34 +92,73 @@ def _resolve_and_parse(file_name: str):
 # ── tools ──
 
 @mcp.tool()
-async def cml2graph_load_model(
-    file_name: Annotated[str, "model graph file name (e.g., 'model.json'). The file will be loaded into your session so you can filter, explain, and render it."],
+async def cml2graph_load_models(
+    files_path: Annotated[list[str], "models graph files path (e.g., ['model1.json', 'model2.json']), or path of the directory containing the files. The files will be loaded into your session so you can filter, explain, and render them."],
     ctx: Context = None,
 ) -> str:
     """
-    Use this to load an uploaded graph model into the session model list and make it active.
-    If the model is already in the list, it is simply activated.
+    Use this to load uploaded graph models into the session model list and make them active.
+    Use the file names (with extensions) of the models to load specific models, or a directory path to load all the models within that directory.
+    If a model is already loaded, nothing will happen.
+    The last models loaded with this tool will be the active model.
     After loading, filter/explain/render tools work on this model.
     """
     session = get_session(ctx)
+    load_success_list = []
+    load_failed_list = []
+    for idx, file_path in enumerate(files_path, 1):
+        if Path(file_path).is_dir():
+            # Load all files in the directory
+            for f in Path(file_path).iterdir():
+                if f.is_file():
+                    load_info = await _cml2graph_load_model(str(f), session)
+                    if load_info["load"] == "success":
+                        load_success_list.append(load_info["load"])
+                    elif load_info["load"] == "failed":
+                        load_failed_list.append(load_info["message"])
+        else:
+            load_info = await _cml2graph_load_model(file_path, session)
+            if load_info["load"] == "success":
+                load_success_list.append(load_info["load"])
+            elif load_info["load"] == "failed":
+                load_failed_list.append(load_info["message"])
+    return_string = f"Loaded {len(load_success_list)} model(s) successfully.\n"
+    if load_failed_list:
+        return_string += f"Failed to load {len(load_failed_list)} model(s):\n"
+        for msg in load_failed_list:
+            return_string += f"- {msg}\n"
+    return_string += (
+        "\nUse cml2graph_list_filters to see available filters and their parameter details.\n"
+        "Use cml2graph_explain_model for a detailed analysis prompt.\n"
+        "Use cml2graph_list_models to see all loaded models.\n"
+        "Note: now call cminer_generate_visualization to update the visualization and show the changes."
+    )
+    set_focus(session, tab="models", model_name=session.get("active_model"), highlight=None)
+    return return_string
+
+
+async def _cml2graph_load_model(file_name:str, session:dict) -> dict:
+    """Internal helper to load a single model into the session."""
     key = Path(file_name).name
 
     # If already loaded, just activate it
     if key in session["models"]:
         session["active_model"] = key
         entry = session["models"][key]
-        summary = summarize_graph(entry["current_graph"])
-        set_focus(session, tab="models", model_name=key, highlight=None)
+
+        summary = summarize_graph_stat_string(entry["current_graph"])
         return (
-            f"Model '{key}' is already loaded — now active.\n\n"
-            f"{summary}\n\n"
-            f"Use cml2graph_list_filters to see available filters and see parameter details."
+            {"load":"already_loaded",
+             "message":
+                f"Model '{key}' is already loaded — now active.\n\n"
+                f"{summary}\n\n"
+            }
         )
 
     try:
         file_path, graph, plugin_name = _resolve_and_parse(file_name)
     except ValueError as e:
-        return str(e)
+        return {"load":"failed", "message": str(e)}
 
     session["models"][key] = {
         "file_path": file_path,
@@ -128,18 +167,18 @@ async def cml2graph_load_model(
         "plugin_name": plugin_name,
     }
     session["active_model"] = key
-    set_focus(session, tab="models", model_name=key, highlight=None)
 
-    summary = summarize_graph(graph)
+    summary = summarize_graph_stat_string(graph)
     total = len(session["models"])
     return (
-        f"Loaded '{key}' as {plugin_name} (model {total} in list, now active).\n\n"
-        f"{summary}\n\n"
-        f"Use cml2graph_list_filters to see available filters and their parameter details.\n"
-        f"Use cml2graph_explain_model for a detailed analysis prompt.\n"
-        f"Use cml2graph_list_models to see all loaded models.\n"
-        f"Note: call cminer_generate_visualization to update the visualization."
+        {"load":"success",
+         "message":
+            f"Loaded '{key}' as {plugin_name} (model {total} in list, now active).\n\n"
+            f"{summary}\n\n"
+        }
     )
+
+
 
 
 @mcp.tool()
@@ -183,41 +222,45 @@ async def cml2graph_select_model(
 
     session["active_model"] = key
     entry = session["models"][key]
-    summary = summarize_graph(entry["current_graph"])
+    summary = summarize_graph_stat_string(entry["current_graph"])
     set_focus(session, tab="models", model_name=key, highlight=None)
     return f"'{key}' is now the active model.\n\n{summary}"
 
 
 @mcp.tool()
-async def cml2graph_remove_model(
-    file_name: Annotated[str, "Name of a model to remove from the list."],
+async def cml2graph_remove_models(
+    files_names: Annotated[list[str], "List of names of the models to remove from the list of the loaded models."],
     ctx: Context = None,
 ) -> str:
-    """Use this to remove a model from the session list. If it was active, active becomes None."""
+    """Use this to remove models from the session list. If any were active, active becomes None."""
     session = get_session(ctx)
-    key = Path(file_name).name
-    if key not in session["models"]:
-        return f"Model '{key}' not in list."
+    focus_clear = {"tab": "models"}
 
-    del session["models"][key]
-    if session["active_model"] == key:
-        session["active_model"] = next(iter(session["models"]), None)
+    for file_name in files_names:
+        key = Path(file_name).name
+        if key not in session["models"]:
+            return f"Model '{key}' not in list."
 
-    # If the focused/highlighted model was the one removed, clear that focus.
-    focus = session.get("focus") or {}
-    fkw: dict = {"tab": "models"}
-    if focus.get("model_name") == key:
-        fkw["model_name"] = session["active_model"]
-    h = focus.get("highlight")
-    if h and h.get("model_name") == key:
-        fkw["highlight"] = None
-    set_focus(session, **fkw)
+        del session["models"][key]
+        if session["active_model"] == key:
+            session["active_model"] = next(iter(session["models"]), None)
 
+        # If one of the focused/highlighted model was the one removed, clear that focus.
+        focus = session.get("focus") or {}
+        fkw: dict = {"tab": "models"}
+        if focus.get("model_name") == key:
+            fkw["model_name"] = session["active_model"]
+        h = focus.get("highlight")
+        if h and h.get("model_name") == key:
+            fkw["highlight"] = None
+        focus_clear = fkw
+    
+    set_focus(session, **focus_clear)
     remaining = len(session["models"])
     active = session["active_model"] or "(none)"
-    result = f"Removed '{key}'. {remaining} model(s) remaining. Active: {active}"
+    result = f"Removed {len(files_names)} model(s). {remaining} model(s) remaining. Active: {active}"
     if remaining > 0 or session.get("patterns"):
-        result += "\nNote: call cminer_generate_visualization to update the visualization."
+        result += "\nNote: now call cminer_generate_visualization to update the visualization and show the changes."
     return result
 
 
@@ -230,7 +273,7 @@ async def cml2graph_clear_models(ctx: Context = None) -> str:
     set_focus(session, tab="models", model_name=None, highlight=None)
     result = "All models cleared from the list."
     if session.get("patterns"):
-        result += "\nNote: call cminer_generate_visualization to update the visualization."
+        result += "\nNote: now call cminer_generate_visualization to update the visualization and show the changes."
     return result
 
 
@@ -239,7 +282,7 @@ async def cml2graph_list_filters(ctx: Context = None) -> str:
     """
     Use this to list all available filters for the active model, with
     descriptions, parameter names, and valid values (enums).
-    Use it before using cml2graph_filter.
+    Use it before using cml2graph_filter_models.
     """
     session = get_session(ctx)
     plugin = get_active_plugin(session)
@@ -271,60 +314,101 @@ async def cml2graph_list_filters(ctx: Context = None) -> str:
 
 
 @mcp.tool()
-async def cml2graph_filter(
+async def cml2graph_filter_models(
+    models_names: Annotated[list[str], "List of names of the models to apply the filter to."],
     filter_name: Annotated[str, "Name of the filter to apply. Call cml2graph_list_filters first to see available names."],
     arguments_json: Annotated[str, "JSON object with filter arguments. Example: {'stereotypes': ['kind', 'role']}. Call cml2graph_list_filters to see valid argument names and values."] = "{}",
     ctx: Context = None,
 ) -> str:
     """
-    Use this to apply a filter to the active model.
+    Use this to apply a filter to the listed models.
     Filters can be chained — each one operates on the result of the previous.
     ALWAYS use cml2graph_list_filters to understand how to use the filters.
-    To undo, use cml2graph_reset_model.
+    To undo the filters, use cml2graph_reset_filters_models.
     """
     session = get_session(ctx)
-    entry = get_active_model_entry(session)
+    entry = None
+    success_dict = {}
+    failed_dict = {}
     plugin = get_active_plugin(session)
-    if entry is None or plugin is None:
-        return "No model loaded. Call cml2graph_load_model first."
+    for key in models_names:
+        key = Path(key).name
+        # If already loaded, just activate it
+        if key in session["models"]:
+            session["active_model"] = key
+            entry = get_active_model_entry(session)
 
-    graph = entry["current_graph"]
+        if entry is None or plugin is None:
+            return "No model loaded. Call cml2graph_load_model first."
+        graph = entry["current_graph"]
 
-    filters = plugin.get_filters()
-    if filter_name not in filters:
-        available = ", ".join(filters.keys())
-        return f"Unknown filter '{filter_name}'. Available: {available}"
+        filters = plugin.get_filters()
+        if filter_name not in filters:
+            available = ", ".join(filters.keys())
+            failed_str = f"Unknown filter '{filter_name}'. Available: {available}"
+            if failed_dict.get("message"):
+                if failed_str not in failed_dict["message"]:
+                    failed_dict["message"] += f"\n{failed_str}"
+                    failed_dict["count"] = failed_dict.get("count", 0) + 1
+            else:
+                failed_dict["message"] = failed_str
+                failed_dict["count"] = 1
+        try:
+            args = json.loads(arguments_json)
+        except json.JSONDecodeError as e:
+            return f"Invalid JSON in arguments_json: {e}"
 
-    try:
-        args = json.loads(arguments_json)
-    except json.JSONDecodeError as e:
-        return f"Invalid JSON in arguments_json: {e}"
+        tool_meta = plugin.get_tool_meta()
+        if filter_name in tool_meta:
+            valid_params = set(tool_meta[filter_name].get("params", {}).keys())
+            unknown = set(args.keys()) - valid_params
+            if unknown and valid_params:
+                failed_str = (
+                    f"Unknown arguments {unknown} for filter '{filter_name}'. "
+                    f"Valid: {valid_params}"
+                )
+                if failed_dict.get("message"):
+                    if failed_str not in failed_dict["message"]:
+                        failed_dict["message"] += f"\n{failed_str}"
+                        failed_dict["count"] = failed_dict.get("count", 0) + 1
+                else:
+                    failed_dict["message"] = failed_str
+                    failed_dict["count"] = 1
+        try:
+            result = filters[filter_name](graph, **args)
+        except TypeError as e:
+            return f"Filter argument error: {e}"
+        except Exception as e:
+            return f"Filter failed: {e}"
 
-    tool_meta = plugin.get_tool_meta()
-    if filter_name in tool_meta:
-        valid_params = set(tool_meta[filter_name].get("params", {}).keys())
-        unknown = set(args.keys()) - valid_params
-        if unknown and valid_params:
-            return (
-                f"Unknown arguments {unknown} for filter '{filter_name}'. "
-                f"Valid: {valid_params}"
-            )
+        graph_stat_before = summarize_graph_stat(entry["current_graph"])
+        entry["current_graph"] = result
+        session["filters_history"] = session.get("filters_history", []) + [{filter_name: args}]
+        graph_stat_current = summarize_graph_stat(result)
+        if success_dict.get("count"):
+            success_dict["count"] = success_dict.get("count", 0) + 1
+            success_dict["nodes_changed"] = success_dict.get("nodes_changed", 0) + (graph_stat_before["Nodes"] - graph_stat_current["Nodes"])
+            success_dict["edges_changed"] = success_dict.get("edges_changed", 0) + (graph_stat_before["Edges"] - graph_stat_current["Edges"])
+        else:
+            success_dict["count"] = 1
 
-    try:
-        result = filters[filter_name](graph, **args)
-    except TypeError as e:
-        return f"Filter argument error: {e}"
-    except Exception as e:
-        return f"Filter failed: {e}"
-
-    entry["current_graph"] = result
-    session["filters_history"] = session.get("filters_history", []) + [{filter_name: args}]
-    summary = summarize_graph(result)
     set_focus(session, tab="models", model_name=session["active_model"], highlight=None)
-    return (
-        f"Filter '{filter_name}' applied to '{session['active_model']}'.\n\n{summary}\n"
-        f"Note: call cminer_generate_visualization to update the visualization."
-    )
+
+    if success_dict.get("count"):
+        success_dict["message"] = (
+            f"Filter '{filter_name}' applied to '{success_dict['count']}  {"model" if success_dict['count'] == 1 else "models"}'.\n"
+            f"Total number of nodes removed: {success_dict.get('nodes_changed', 0)}\n"
+            f"Total number of edges removed: {success_dict.get('edges_changed', 0)}\n"
+        )
+    # Total string report
+    total_str = success_dict.get("message", "")
+    if failed_dict.get("count"):
+        total_str += f"Failed to apply filter to '{failed_dict['count']}  {"model" if failed_dict['count'] == 1 else "models"}':\n{failed_dict['message']}\n\n"
+        total_str += f"The agregated reason for the failure is: {failed_dict['message']}\n\n"
+
+    total_str += f"Note: now call cminer_generate_visualization to update the visualization and show the changes."
+    return total_str
+
 
 
 @mcp.tool()
@@ -340,32 +424,59 @@ async def cml2graph_explain_model(ctx: Context = None) -> str:
         return "No model loaded. Call cml2graph_load_model first."
 
     graph = entry["current_graph"]
-    summary_structure_string = summarize_graph(graph)
+    summary_structure_string = summarize_graph_stat_string(graph)
     general_string = plugin.get_general_prompt(graph)
     return f"structure:{summary_structure_string}\n\ninformation:{general_string}"
 
 
 @mcp.tool()
-async def cml2graph_reset_model(
-    file_name: Annotated[str | None, "Name of a model to reset. If omitted, resets the active model."] = None,
+async def cml2graph_reset_filters_models(
+    files_names: Annotated[list[str], "The names of models to reset, if empty reset all the models."],
     ctx: Context = None,
 ) -> str:
-    """Use this to reset a model to its original state, unfiltered state, undoing all applied filters."""
+    """
+    Use this to reset the specified listed models (or all models if unspecified) to their original state, unfiltered state, undoing all applied filters.
+    It is MANDATORY to update the visualization after the use of this tool.
+    """
     session = get_session(ctx)
-    key = Path(file_name).name if file_name else session.get("active_model")
-    if key is None or key not in session["models"]:
-        return "Model not found. Call cml2graph_load_model first."
+    failed_dict = {}
+    success_dict = {}
+    if files_names is None or len(files_names) == 0:
+        files_names = list(session["models"].keys())
 
-    entry = session["models"][key]
-    entry["current_graph"] = copy.deepcopy(entry["original_graph"])
-    summary = summarize_graph(entry["current_graph"])
-    set_focus(session, tab="models", model_name=key, highlight=None)
-    return (
-        f"Model '{key}' reset to original state.\n\n{summary}\n"
-        f"Note: call cminer_generate_visualization to update the visualization."
-    )
+    for file_name in files_names:
+        key = Path(file_name).name
+        if key is None or key not in session["models"]:
+            failed_str = f"Model not found. Call cml2graph_load_model first."
+            if failed_dict.get("message"):
+                if failed_str not in failed_dict["message"]:
+                    failed_dict["message"] += f"\n{failed_str}"
+                    failed_dict["count"] = failed_dict.get("count", 0) + 1
+            else:
+                failed_dict["message"] = failed_str
+                failed_dict["count"] = 1
+            continue
 
+        entry = session["models"][key]
+        graph_stat_before = summarize_graph_stat(entry["original_graph"])
+        graph_stat_after = summarize_graph_stat(entry["current_graph"])
+        entry["current_graph"] = copy.deepcopy(entry["original_graph"])
+        success_dict["count"] = success_dict.get("count", 0) + 1
+        success_dict["nodes_changed"] = success_dict.get("nodes_changed", 0) + (graph_stat_before["Nodes"] - graph_stat_after["Nodes"])
+        success_dict["edges_changed"] = success_dict.get("edges_changed", 0) + (graph_stat_before["Edges"] - graph_stat_after["Edges"])
 
+    set_focus(session, tab="models", model_name=session["active_model"], highlight=None)
+    total_str = ""
+    if success_dict.get("count"):
+        total_str += (
+            f"Reset {success_dict['count']} model(s) to original state.\n"
+            f"Total number of nodes reintroduced: {success_dict.get('nodes_changed', 0)}\n"
+            f"Total number of edges reintroduced: {success_dict.get('edges_changed', 0)}\n\n"
+        )
+    if failed_dict.get("count"):
+        total_str += f"Failed to reset {failed_dict['count']} model(s):\n{failed_dict['message']}\n\n"
+    total_str += f"."
+    return total_str
 
 
 
